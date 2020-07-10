@@ -49,3 +49,4 @@ configure(javaProjects) {
         }
     }
 }
+bootJar { enabled = false}
