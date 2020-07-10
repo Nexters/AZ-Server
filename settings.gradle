@@ -1,0 +1,4 @@
+rootProject.name = 'youtugo'
+include 'youtugo-api'
+include 'youtugo-domain'
+
