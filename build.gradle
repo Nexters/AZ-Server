@@ -16,6 +16,11 @@ test {
     useJUnitPlatform()
 }
 
+jar {
+    baseName = 'youtugo-api'
+    version = '0.0.1'
+}
+
 def javaProjects = [
         project(':youtugo-api'),
         project(':youtugo-domain'),
@@ -50,3 +55,4 @@ configure(javaProjects) {
     }
 }
 bootJar { enabled = false}
+jar { enabled = true }
