@@ -17,7 +17,7 @@ test {
 }
 
 def javaProjects = [
-        project(':youtugo-api'),
+        project(':youtugo-application'),
         project(':youtugo-domain'),
         project(':youtugo-core')
 ]
