@@ -1,5 +1,0 @@
-dependencies {
-    api project(':youtugo-domain')
-    api project(':youtugo-core')
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}

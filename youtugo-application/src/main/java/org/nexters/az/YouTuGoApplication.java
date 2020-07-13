@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class YouTuGoApiApplication {
+public class YouTuGoApplication {
     public static void main(String[] args){
-        SpringApplication.run(YouTuGoApiApplication.class,args);
+        SpringApplication.run(YouTuGoApplication.class,args);
     }
 }
