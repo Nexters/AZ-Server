@@ -19,7 +19,6 @@ test {
     useJUnitPlatform()
 }
 
-
 allprojects {
     group = 'org.nexters.az'
     version = '0.0.1-SNAPSHOT'
@@ -30,6 +29,7 @@ def javaProjects = [
         project(':youtugo-domain'),
         project(':youtugo-core')
 ]
+
 configure(javaProjects) {
     apply plugin: 'java'
     apply plugin: 'java-library'
@@ -60,7 +60,10 @@ configure(javaProjects) {
         }
     }
 }
-bootJar { enabled = false}
+
+bootJar {
+    enabled = false
+}
 
 project(':youtugo-application') {
     dependencies {
@@ -74,6 +77,7 @@ project(':youtugo-domain') {
         compile project(':youtugo-core')
     }
 }
+
 project(':youtugo-core') {
     dependencies {
 
