@@ -1,12 +1,15 @@
+buildscript {
+    ext {
+        springBootVersion = '2.3.1.RELEASE'
+        junitVersion = '4.12'
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.3.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
 }
-
-group = 'org.nexters.az'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
@@ -16,13 +19,18 @@ test {
     useJUnitPlatform()
 }
 
+allprojects {
+    group = 'org.nexters.az'
+    version = '0.0.1-SNAPSHOT'
+}
+
 jar {
-    baseName = 'youtugo-api'
+    baseName = 'youtugo-application'
     version = '0.0.1'
 }
 
 def javaProjects = [
-        project(':youtugo-api'),
+        project(':youtugo-application'),
         project(':youtugo-domain'),
         project(':youtugo-core')
 ]
