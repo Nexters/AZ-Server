@@ -1,12 +1,15 @@
+buildscript {
+    ext {
+        springBootVersion = '2.3.1.RELEASE'
+        junitVersion = '4.12'
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.3.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
 }
-
-group = 'org.nexters.az'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
@@ -16,13 +19,18 @@ test {
     useJUnitPlatform()
 }
 
+allprojects {
+    group = 'org.nexters.az'
+    version = '0.0.1-SNAPSHOT'
+}
+
 jar {
-    baseName = 'youtugo-api'
+    baseName = 'youtugo-application'
     version = '0.0.1'
 }
 
 def javaProjects = [
-        project(':youtugo-api'),
+        project(':youtugo-application'),
         project(':youtugo-domain'),
         project(':youtugo-core')
 ]
@@ -49,10 +57,28 @@ configure(javaProjects) {
         developmentOnly 'org.springframework.boot:spring-boot-devtools'
         annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
         annotationProcessor 'org.projectlombok:lombok'
+        testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
         testImplementation('org.springframework.boot:spring-boot-starter-test') {
             exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         }
     }
 }
 bootJar { enabled = false}
-jar { enabled = true }
+
+project(':youtugo-application') {
+    dependencies {
+        compile project(':youtugo-core')
+        compile project(':youtugo-domain')
+    }
+}
+
+project(':youtugo-domain') {
+    dependencies {
+        compile project(':youtugo-core')
+    }
+}
+project(':youtugo-core') {
+    dependencies {
+
+    }
+}
