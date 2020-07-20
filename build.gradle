@@ -63,7 +63,10 @@ configure(javaProjects) {
         }
     }
 }
-bootJar { enabled = false}
+
+bootJar {
+    enabled = false
+}
 
 project(':youtugo-application') {
     dependencies {
@@ -77,6 +80,7 @@ project(':youtugo-domain') {
         compile project(':youtugo-core')
     }
 }
+
 project(':youtugo-core') {
     dependencies {
 
