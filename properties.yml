@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://database-az.c4usnhnbr7bn.ap-northeast-2.rds.amazonaws.com
+    username: admin
+    password: ${{ secrets.MYSQL_PW }}
