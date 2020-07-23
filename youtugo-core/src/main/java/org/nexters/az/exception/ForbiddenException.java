@@ -1,11 +1,14 @@
 package org.nexters.az.exception;
 
-public class ForbiddenException extends CanHaveStatusException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+public class ForbiddenException extends ResponseStatusException {
 
     public ForbiddenException(){
         this("Forbidden Exception");
     }
     public ForbiddenException(String message) {
-        super(403, message);
+        super(HttpStatus.FORBIDDEN, message);
     }
 }
