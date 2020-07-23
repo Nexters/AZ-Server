@@ -1,10 +1,13 @@
 package org.nexters.az.exception;
 
-public class BadRequestException extends CanHaveStatusException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+public class BadRequestException extends ResponseStatusException {
     public BadRequestException() {
         this("Bad Request Exception");
     }
     public BadRequestException(String message){
-        super(400, message);
+        super(HttpStatus.BAD_REQUEST, message);
     }
 }

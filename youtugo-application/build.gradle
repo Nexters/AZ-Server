@@ -1,7 +1,6 @@
 dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swaggerVersion}"
     compile group: 'io.springfox', name: 'springfox-swagger2', version: "${swaggerVersion}"
-    compile group: 'mysql', name: 'mysql-connector-java', version: "${mysqlVersion}"
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }

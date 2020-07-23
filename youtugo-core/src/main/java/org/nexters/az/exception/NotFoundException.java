@@ -1,11 +1,14 @@
 package org.nexters.az.exception;
 
-public class NotFoundException extends CanHaveStatusException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+public class NotFoundException extends ResponseStatusException {
 
     public NotFoundException(){
         this("NotFound Exception");
     }
     public NotFoundException(String message) {
-        super(404, message);
+        super(HttpStatus.NOT_FOUND, message);
     }
 }
