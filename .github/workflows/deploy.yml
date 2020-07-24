@@ -36,6 +36,9 @@ jobs:
       - name: Copy Jar
         run: cp youtugo-application/build/libs/*.jar code-deploy-youtugo-application/
 
+      - name: Copy appspec
+        run: cp appspec.yml code-deploy-youtugo-application
+
       - name: Make zip file
         run: zip -r -j code-deploy-youtugo-application.zip code-deploy-youtugo-application/*
 
@@ -48,6 +51,18 @@ jobs:
           --region ap-northeast-2 \
           --acl private \
           code-deploy-youtugo-application.zip s3://az-deploy/
+
+      - name: Deploy
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: |
+            aws deploy create-deployment \
+            --application-name az-deploy \
+            --deployment-group-name az-deploy-group \
+            --file-exists-behavior OVERWRITE \
+            --s3-location bucket=az-deploy,bundleType=zip,key=code-deploy-youtugo-application.zip \
+            --region ap-northeast-2
 
 
 
