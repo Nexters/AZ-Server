@@ -9,7 +9,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class SearchPostsResponse {
+public class GetPostsResponse {
     private List<DetailedPost> posts;
     private SimplePage simplePage;
 }

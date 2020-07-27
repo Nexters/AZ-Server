@@ -6,7 +6,7 @@ import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.request.WritePostRequest;
-import org.nexters.az.post.response.SearchPostsResponse;
+import org.nexters.az.post.response.GetPostsResponse;
 import org.nexters.az.post.response.WritePostResponse;
 import org.nexters.az.post.service.PostService;
 import org.nexters.az.user.entity.User;
@@ -57,11 +57,11 @@ public class PostController {
     @ApiOperation("게시글들 조회")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public SearchPostsResponse searchPosts(
+    public GetPostsResponse getPosts(
         @RequestParam(required = false, defaultValue = "0") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        Page<Post> searchResult = postService.search(PageRequest.of(currentPage, size, Sort.by("createdDate").descending()));
+        Page<Post> searchResult = postService.getPosts(PageRequest.of(currentPage, size, Sort.by("createdDate").descending()));
         SimplePage simplePage = SimplePage.builder()
                 .currentPage(searchResult.getNumber())
                 .totalPages(searchResult.getTotalPages())
@@ -69,7 +69,7 @@ public class PostController {
                 .build();
         List<DetailedPost> detailedPosts = detailedPostsOf(searchResult.getContent());
 
-        return new SearchPostsResponse(detailedPosts, simplePage);
+        return new GetPostsResponse(detailedPosts, simplePage);
     }
 
     private List<DetailedPost> detailedPostsOf(List<Post> posts) {
