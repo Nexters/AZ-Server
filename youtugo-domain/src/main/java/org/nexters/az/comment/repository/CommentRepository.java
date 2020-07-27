@@ -2,12 +2,12 @@ package org.nexters.az.comment.repository;
 
 import org.nexters.az.comment.entity.Comment;
 import org.nexters.az.common.repository.ExtendRepository;
-import org.nexters.az.post.entity.Post;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.Optional;
 
 public interface CommentRepository extends ExtendRepository<Comment> {
-    List<Comment> findAllByPost(Post post);
+    Page<Comment> findAllByPostId(Long postId, Pageable pageable);
 
-    Comment findByPostAndId(Post post, Long id);
+    Optional<Comment> findByPostIdAndId(Long postId, Long commentId);
 }

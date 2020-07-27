@@ -4,19 +4,22 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.nexters.az.comment.dto.DetailedComment;
 import org.nexters.az.comment.entity.Comment;
-import org.nexters.az.comment.exception.DeleterNotFoundException;
 import org.nexters.az.comment.request.WriteCommentRequest;
 import org.nexters.az.comment.response.GetCommentsResponse;
 import org.nexters.az.comment.response.WriteCommentResponse;
 import org.nexters.az.comment.service.CommentService;
+import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.repository.PostRepository;
 import org.nexters.az.user.entity.User;
 import org.nexters.az.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,11 +35,13 @@ public class CommentController {
     // TODO 2: 추후 [TODO 1] 이 구현됨에 따라 삭제될 예정
     private final UserRepository userRepository;
 
-    @ApiOperation("댓글작성")
+    @ApiOperation("댓글 작성")
     @PostMapping("/{postId}/comments/comment")
     @ResponseStatus(HttpStatus.CREATED)
-    public WriteCommentResponse write(@PathVariable Long postId,
-                                      WriteCommentRequest writeCommentRequest) {
+    public WriteCommentResponse writeComment(@PathVariable Long postId,
+                                             @RequestHeader String accessToken,
+                                             @RequestBody WriteCommentRequest writeCommentRequest) {
+
         // TODO 1: 추후 accessToken으로 댓글 작성자 찾기(아래 코드는 가데이터)
         User user = User.builder()
                 .identification("test")
@@ -48,7 +53,7 @@ public class CommentController {
         // TODO 3: 추후 PostService로 댓글에 대한 게시글 찾기
         Post post = postRepository.findById(postId, Post.class).orElseThrow(() -> new NoSuchElementException("해당 게시글이 없습니다"));
 
-        DetailedComment detailedComment = detailedCommentOf(
+        DetailedComment detailedComment = DetailedComment.detailedCommentOf(
                 commentService.create(Comment.builder()
                         .post(post)
                         .writer(writer)
@@ -58,36 +63,34 @@ public class CommentController {
         return new WriteCommentResponse(detailedComment);
     }
 
-    @ApiOperation("해당 게시글에 대한 댓글들 불러오기")
+    @ApiOperation("해당 게시글에 대한 댓글들 조회")
     @GetMapping("/{postId}/comments")
     @ResponseStatus(HttpStatus.OK)
-    public GetCommentsResponse getComments(@PathVariable Long postId) {
+    public GetCommentsResponse getComments(@PathVariable Long postId,
+                                           @RequestHeader String accessToken,
+                                           @RequestParam(required = false, defaultValue = "0") int currentPage,
+                                           @RequestParam(required = false, defaultValue = "10") int size) {
 
         // TODO 3: 추후 PostService로 댓글에 대한 게시글 찾기
         Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("해당 게시글이 없습니다"));
 
-        return new GetCommentsResponse(detailedCommentsOf(commentService.getComments(post)));
-    }
+        Page<Comment> commentList = commentService.getComments(post, PageRequest.of(currentPage, size, Sort.by("createdDate").descending()));
+        SimplePage simplePage = SimplePage.builder()
+                .currentPage(commentList.getNumber())
+                .totalPages(commentList.getTotalPages())
+                .totalElements(commentList.getTotalElements())
+                .build();
 
-    private List<DetailedComment> detailedCommentsOf(List<Comment> comments) {
-        List<DetailedComment> detailedComments = new ArrayList<>();
-        comments.forEach(comment -> {
-            detailedComments.add(detailedCommentOf(comment));
-        });
+        List<DetailedComment> detailedCommentList = DetailedComment.detailedCommentsOf(commentList.getContent());
 
-        return detailedComments;
-    }
-
-    private DetailedComment detailedCommentOf(Comment comment) {
-        return new DetailedComment(comment);
+        return new GetCommentsResponse(detailedCommentList, simplePage);
     }
 
     @ApiOperation("댓글 삭제")
     @DeleteMapping("/{postId}/comments/{commentId}")
-    public void delete(@PathVariable Long postId,
-                       @PathVariable Long commentId) {
-
-        Comment comment = commentService.getComment(commentId);
+    public ResponseEntity delete(@PathVariable Long postId,
+                                 @PathVariable Long commentId,
+                                 @RequestHeader String accessToken) {
 
         // TODO 1: 추후 accessToken으로 댓글 삭제하려는 사용자 찾기(아래 코드는 가데이터)
         User user = User.builder()
@@ -97,18 +100,9 @@ public class CommentController {
                 .build();
         User deleter = userRepository.save(user);
 
-        checkWriter(deleter, comment.getWriter());
-
         // TODO 3: 추후 PostService로 댓글에 대한 게시글 찾기
         Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("해당 게시글이 없습니다"));
 
-        commentService.delete(post, commentId);
-
-    }
-
-    private void checkWriter(User deleter, User writer) {
-        if (deleter.getId().equals(writer.getId()))
-            return;
-        throw new DeleterNotFoundException();
+        return commentService.deleteComment(deleter, post, commentId);
     }
 }

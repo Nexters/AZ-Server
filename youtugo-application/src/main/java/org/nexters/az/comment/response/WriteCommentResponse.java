@@ -8,4 +8,5 @@ import org.nexters.az.comment.dto.DetailedComment;
 @AllArgsConstructor
 public class WriteCommentResponse {
     private DetailedComment detailedComment;
+
 }

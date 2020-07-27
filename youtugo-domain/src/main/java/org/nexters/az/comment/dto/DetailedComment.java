@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.nexters.az.comment.entity.Comment;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class DetailedComment {
@@ -22,4 +24,18 @@ public class DetailedComment {
         this.writer=comment.getWriter().getNickname();
         this.content=comment.getComment();
     }
+
+    public static List<DetailedComment> detailedCommentsOf(List<Comment> comments) {
+        List<DetailedComment> detailedComments = new ArrayList<>();
+        comments.forEach(comment -> {
+            detailedComments.add(detailedCommentOf(comment));
+        });
+
+        return detailedComments;
+    }
+
+    public static DetailedComment detailedCommentOf(Comment comment) {
+        return new DetailedComment(comment);
+    }
+
 }

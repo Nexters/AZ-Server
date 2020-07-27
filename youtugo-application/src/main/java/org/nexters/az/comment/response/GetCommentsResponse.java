@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.nexters.az.comment.dto.DetailedComment;
 import org.nexters.az.comment.entity.Comment;
+import org.nexters.az.common.dto.SimplePage;
 
 import java.util.List;
 
@@ -11,4 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 public class GetCommentsResponse {
     private List<DetailedComment> commentList;
+    private SimplePage simplePage;
 }
