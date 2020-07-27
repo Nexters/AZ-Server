@@ -22,13 +22,10 @@ public class User {
     @Column(nullable = false)
     private String hashedPassword;
 
-    private int point = 0;
-
     @Builder
     public User(String identification, String nickname, String hashedPassword) {
         this.identification = identification;
         this.nickname = nickname;
         this.hashedPassword = hashedPassword;
-        this.point = 0;
     }
 }
