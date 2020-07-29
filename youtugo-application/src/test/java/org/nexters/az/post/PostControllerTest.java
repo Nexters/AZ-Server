@@ -19,7 +19,6 @@ public class PostControllerTest extends CommonTest {
                 .contentType(MediaType.APPLICATION_JSON)
         ).andReturn();
 
-        System.out.println(mvcResult.getResponse().getContentAsString());
         assertEquals(200, mvcResult.getResponse().getStatus());
     }
 }

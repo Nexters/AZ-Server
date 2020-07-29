@@ -2,6 +2,10 @@ package org.nexters.az.post.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.nexters.az.common.exception.CurrentPageRangeException;
+import org.nexters.az.common.exception.PageSizeRangeException;
+import org.nexters.az.common.validation.CurrentPageValidation;
+import org.nexters.az.common.validation.PageSizeValidation;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
@@ -29,6 +33,9 @@ public class PostController {
     // TODO 1 : 삭제예정
     private final UserRepository userRepository;
 
+    private final PageSizeValidation pageSizeValidation = new PageSizeValidation();
+    private final CurrentPageValidation currentPageValidation = new CurrentPageValidation();
+
     @ApiOperation("게시글 작성")
     @PostMapping("/post")
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,7 +43,6 @@ public class PostController {
         @RequestHeader String accessToken,
         @RequestBody WritePostRequest writePostRequest
     ) {
-        System.out.println(writePostRequest);
         // TODO 1: 추후 accessToken으로 사용자를 찾기(아래 코드는 가데이터)
         User user = User.builder()
                 .identification("test")
@@ -58,10 +64,21 @@ public class PostController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getPosts(
-        @RequestParam(required = false, defaultValue = "0") int currentPage,
+        @RequestParam(required = false, defaultValue = "1") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        Page<Post> searchResult = postService.getPosts(PageRequest.of(currentPage, size, Sort.by("createdDate").descending()));
+        try {
+            currentPageValidation.verify(currentPage);
+        } catch (CurrentPageRangeException currentPageRangeException) {
+            currentPage = 1;
+        }
+        try {
+            pageSizeValidation.verify(size);
+        } catch (PageSizeRangeException pageSizeRangeException) {
+            size = 10;
+        }
+
+        Page<Post> searchResult = postService.getPosts(PageRequest.of(currentPage - 1, size, Sort.by("createdDate").descending()));
         SimplePage simplePage = SimplePage.builder()
                 .currentPage(searchResult.getNumber())
                 .totalPages(searchResult.getTotalPages())
