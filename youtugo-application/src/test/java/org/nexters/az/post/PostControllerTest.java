@@ -21,4 +21,19 @@ public class PostControllerTest extends CommonTest {
 
         assertEquals(200, mvcResult.getResponse().getStatus());
     }
+
+    // TODO 1 : 게시글 작성 성공
+
+    // TODO 2 : 게시글 작성 실패 - 권한 없음
+
+    // TODO 3 : 게시글 상세보기 성공
+
+    // TODO 4 : 게시글 상세보기 실패 - 존재하지 않는 게시글
+
+    // TODO 5 : 게시글 삭제 성공
+
+    // TODO 6 : 게시글 삭제 실패 - 삭제 권한 없음
+
+    // TODO 7 : 게시글 삭제 실패 - 존재하지 않는 게시글
+
 }

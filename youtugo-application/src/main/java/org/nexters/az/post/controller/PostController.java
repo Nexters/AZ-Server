@@ -9,7 +9,11 @@ import org.nexters.az.common.validation.PageSizeValidation;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
+import org.nexters.az.post.exception.NoPermissionDeletePostException;
+import org.nexters.az.post.exception.NonExistentPostException;
 import org.nexters.az.post.request.WritePostRequest;
+import org.nexters.az.post.response.DeletePostResponse;
+import org.nexters.az.post.response.GetPostResponse;
 import org.nexters.az.post.response.GetPostsResponse;
 import org.nexters.az.post.response.WritePostResponse;
 import org.nexters.az.post.service.PostService;
@@ -88,6 +92,34 @@ public class PostController {
 
         return new GetPostsResponse(detailedPosts, simplePage);
     }
+
+    @ApiOperation("게시글 상세보기")
+    @GetMapping("/{postId}")
+    @ResponseStatus(HttpStatus.OK)
+    public GetPostResponse getPost(@PathVariable Long postId) {
+        DetailedPost detailedPost =  detailedPostOf(postService.getPost(postId));
+
+        return new GetPostResponse(detailedPost);
+    }
+
+    @ApiOperation("게시글 삭제")
+    @DeleteMapping("/{postId}")
+    public DeletePostResponse deletePost(@PathVariable Long postId) {
+        // TODO : 게시글 유저 아이디 확인하기
+        Long userId = 10L;
+
+        Post post = postService.getPost(postId);
+        if(!post.getAuthor().getId().equals(userId)) {
+            throw new NoPermissionDeletePostException();
+        }
+        postService.deletePost(postId, userId);
+
+        boolean isDeleted = !postService.checkExistPost(postId);
+
+
+        return new DeletePostResponse(isDeleted);
+    }
+
 
     private List<DetailedPost> detailedPostsOf(List<Post> posts) {
         List<DetailedPost> detailedPosts = new ArrayList<>();
