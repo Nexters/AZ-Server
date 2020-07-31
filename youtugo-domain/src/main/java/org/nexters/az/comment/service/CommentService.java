@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
     private final CommentRepository commentRepository;
 
-    public Comment create(Comment comment) {
+    public Comment createComment(Comment comment) {
         return commentRepository.save(comment);
     }
 
@@ -27,17 +27,22 @@ public class CommentService {
         return commentRepository.findAllByPostId(post.getId(), pageable);
     }
 
-    public ResponseEntity deleteComment(User deleter, Post post, Long commentId) {
-        Comment comment = commentRepository.findById(commentId, Comment.class).orElseThrow(CommentNotFoundException::new);
-        checkWriter(deleter.getId(), comment.getId());
-        Comment commentForDelete = commentRepository.findByPostIdAndId(post.getId(),
-                commentId).orElseThrow(CommentNotFoundException::new);
+    public ResponseEntity deleteComment(User deleter, Long commentId) {
+        Comment commentForDelete = commentRepository.findById(commentId, Comment.class).orElseThrow(CommentNotFoundException::new);
+        checkWriter(deleter.getId(), commentForDelete.getId());
         commentRepository.delete(commentForDelete);
         return ResponseEntity.noContent().build();
     }
 
-    private void checkWriter(Long deleterId, Long writerId) {
-        if (deleterId.equals(writerId))
+    public Comment modifyComment(User modifier, Long commentId, Comment modifyComment){
+        Comment commentForModify = commentRepository.findById(commentId, Comment.class).orElseThrow(CommentNotFoundException::new);
+        checkWriter(modifier.getId(), commentForModify.getId());
+        commentForModify.modifyComment(modifyComment.getComment());
+        return commentRepository.save(commentForModify);
+    }
+
+    private void checkWriter(Long accessId, Long writerId) {
+        if (accessId.equals(writerId))
             return;
         throw new CommentUnauthorizedException();
     }
