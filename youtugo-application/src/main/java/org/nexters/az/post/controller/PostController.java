@@ -10,7 +10,6 @@ import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.exception.NoPermissionDeletePostException;
-import org.nexters.az.post.exception.NonExistentPostException;
 import org.nexters.az.post.request.WritePostRequest;
 import org.nexters.az.post.response.DeletePostResponse;
 import org.nexters.az.post.response.GetPostResponse;
@@ -123,9 +122,7 @@ public class PostController {
 
     private List<DetailedPost> detailedPostsOf(List<Post> posts) {
         List<DetailedPost> detailedPosts = new ArrayList<>();
-        posts.forEach(post -> {
-            detailedPosts.add(detailedPostOf(post));
-        });
+        posts.forEach(post -> detailedPosts.add(detailedPostOf(post)));
 
         return detailedPosts;
     }

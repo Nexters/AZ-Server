@@ -10,4 +10,6 @@ public interface PostRepository extends ExtendRepository<Post> {
     void deleteByIdAndAuthorId(Long postId, Long userId);
 
     boolean existsById(Long postId);
+
+    int countAllByAuthorId(Long authorId);
 }
