@@ -20,6 +20,10 @@ public class User {
     private String nickname;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Rating rating;
+
+    @Column(nullable = false)
     private String hashedPassword;
 
     @Builder
@@ -27,5 +31,10 @@ public class User {
         this.identification = identification;
         this.nickname = nickname;
         this.hashedPassword = hashedPassword;
+        this.rating = Rating.NEW_RECRUIT;
+    }
+
+    public void setRating(Rating rating) {
+        this.rating = rating;
     }
 }
