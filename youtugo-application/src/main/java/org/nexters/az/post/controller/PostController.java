@@ -11,10 +11,7 @@ import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.exception.NoPermissionDeletePostException;
 import org.nexters.az.post.request.WritePostRequest;
-import org.nexters.az.post.response.DeletePostResponse;
-import org.nexters.az.post.response.GetPostResponse;
-import org.nexters.az.post.response.GetPostsResponse;
-import org.nexters.az.post.response.WritePostResponse;
+import org.nexters.az.post.response.*;
 import org.nexters.az.post.service.PostService;
 import org.nexters.az.user.entity.User;
 import org.nexters.az.user.repository.UserRepository;
@@ -92,6 +89,19 @@ public class PostController {
         return new GetPostsResponse(detailedPosts, simplePage);
     }
 
+    @ApiOperation("인기 게시글 조회")
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public GetPostsResponse getPopularPosts(
+        @RequestParam(required = false, defaultValue = "1") int currentPage,
+        @RequestParam(required = false, defaultValue = "10") int size
+    ) {
+        /**
+         * 현재 엔드포인트만 잡은 상태
+         */
+        return null;
+    }
+
     @ApiOperation("게시글 상세보기")
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
@@ -119,6 +129,15 @@ public class PostController {
         return new DeletePostResponse(isDeleted);
     }
 
+    @ApiOperation("게시글 추천")
+    @PostMapping("/{postId}/likes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public GetPostResponse insertLikeInPost(@PathVariable Long postId) {
+        /**
+         * 현재 엔드포인트만 잡은 상태
+         */
+        return null;
+    }
 
     private List<DetailedPost> detailedPostsOf(List<Post> posts) {
         List<DetailedPost> detailedPosts = new ArrayList<>();
@@ -128,11 +147,14 @@ public class PostController {
     }
 
     private DetailedPost detailedPostOf(Post post) {
+        DetailedPost detailedPost = new DetailedPost(post);
         // TODO 1: PostLikeService를 통해 좋아요 수 찾기(아래 코드는 가데이터)
-        int likes = 3;
+        detailedPost.setLikes(10);
         // TODO 2: PostBookmarService를 통해 북마크 수 찾기(아래 코드는 가데이터)
-        int bookMarks = 10;
+        detailedPost.setBookMarks(3);
+        // TODO 3 : 자신의 추천 정보
+        detailedPost.setIsPressLike(false);
 
-        return new DetailedPost(post, likes, bookMarks);
+        return detailedPost;
     }
 }
