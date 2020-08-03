@@ -36,4 +36,8 @@ public class Comment extends BaseTime {
         this.writer = writer;
         this.comment = comment;
     }
+
+    public void modifyComment(String comment) {
+       this.comment = comment;
+    }
 }
