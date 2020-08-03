@@ -12,16 +12,27 @@ public class DetailedPost {
     private String content;
     private int likes;
     private int bookMarks;
+    private boolean isPressLike;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public DetailedPost(Post post, int likes, int bookMarks) {
+    public DetailedPost(Post post) {
         this.id = post.getId();
         this.authorNickname = post.getAuthor().getNickname();
         this.content = post.getContent();
-        this.likes = likes;
-        this.bookMarks = bookMarks;
         this.createdDate = post.getCreatedDate();
         this.modifiedDate = post.getModifiedDate();
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public void setBookMarks(int bookMarks) {
+        this.bookMarks = bookMarks;
+    }
+
+    public void setIsPressLike(boolean isPressLike) {
+        this.isPressLike = isPressLike;
     }
 }
