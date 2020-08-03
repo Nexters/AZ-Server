@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -89,7 +88,7 @@ public class CommentController {
     }
 
     @ApiOperation("댓글 수정")
-    @PutMapping("/{postId}/comments/{commentId}")
+    @PatchMapping("/{postId}/comments/{commentId}")
     public ModifyCommentResponse modifyComment(@PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @RequestBody ModifyCommentRequest modifyCommentRequest,
@@ -113,7 +112,7 @@ public class CommentController {
 
     @ApiOperation("댓글 삭제")
     @DeleteMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity deleteComment(@PathVariable Long postId,
+    public void deleteComment(@PathVariable Long postId,
                                  @PathVariable Long commentId,
                                  @RequestHeader String accessToken) {
 
@@ -127,7 +126,6 @@ public class CommentController {
 
         // TODO 3: 추후 PostService로 댓글에 대한 게시글 찾기
         Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("해당 게시글이 없습니다"));
-
-        return commentService.deleteComment(deleter, commentId);
+        commentService.deleteComment(deleter, commentId);
     }
 }
