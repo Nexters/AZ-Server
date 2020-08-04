@@ -2,11 +2,10 @@ package org.nexters.az.post.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.nexters.az.common.exception.CurrentPageRangeException;
-import org.nexters.az.common.exception.PageSizeRangeException;
-import org.nexters.az.common.validation.CurrentPageValidation;
-import org.nexters.az.common.validation.PageSizeValidation;
+import org.nexters.az.comment.service.CommentService;
+import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
+import org.nexters.az.common.validation.PageValidation;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.exception.NoPermissionDeletePostException;
@@ -29,12 +28,12 @@ import java.util.List;
 @RequestMapping("v1/api/posts")
 public class PostController {
     private final PostService postService;
-
-    // TODO 1 : 삭제예정
+    private final CommentService commentService;
+    /**
+     * author : 최민성
+     * TODO : 삭제예정
+     */
     private final UserRepository userRepository;
-
-    private final PageSizeValidation pageSizeValidation = new PageSizeValidation();
-    private final CurrentPageValidation currentPageValidation = new CurrentPageValidation();
 
     @ApiOperation("게시글 작성")
     @PostMapping("/post")
@@ -43,7 +42,10 @@ public class PostController {
         @RequestHeader String accessToken,
         @RequestBody WritePostRequest writePostRequest
     ) {
-        // TODO 1: 추후 accessToken으로 사용자를 찾기(아래 코드는 가데이터)
+        /**
+         * author : 최민성
+         * TODO : 추후 accessToken으로 사용자를 찾기(아래 코드는 가데이터)
+         */
         User user = User.builder()
                 .identification("test")
                 .nickname("test")
@@ -57,7 +59,7 @@ public class PostController {
                 .build();
         post = postService.create(post);
 
-        return new WritePostResponse(detailedPostOf(post));
+        return new WritePostResponse(detailedPostOf(post, user.getId()));
     }
 
     @ApiOperation("게시글들 조회")
@@ -67,24 +69,27 @@ public class PostController {
         @RequestParam(required = false, defaultValue = "1") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        try {
-            currentPageValidation.verify(currentPage);
-        } catch (CurrentPageRangeException currentPageRangeException) {
-            currentPage = 1;
-        }
-        try {
-            pageSizeValidation.verify(size);
-        } catch (PageSizeRangeException pageSizeRangeException) {
-            size = 10;
-        }
+        /**
+         * author : 최민성
+         * TODO : 유저 구해야함
+         */
 
-        Page<Post> searchResult = postService.getPosts(PageRequest.of(currentPage - 1, size, Sort.by("createdDate").descending()));
+        CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
+
+        Page<Post> searchResult = postService.getPosts(
+            PageRequest.of(
+                currentPageAndPageSize.getCurrentPage() - 1,
+                currentPageAndPageSize.getPageSize(),
+                Sort.by("createdDate").descending()
+            )
+        );
+
         SimplePage simplePage = SimplePage.builder()
                 .currentPage(searchResult.getNumber())
                 .totalPages(searchResult.getTotalPages())
                 .totalElements(searchResult.getTotalElements())
                 .build();
-        List<DetailedPost> detailedPosts = detailedPostsOf(searchResult.getContent());
+        List<DetailedPost> detailedPosts = detailedPostsOf(searchResult.getContent(), null);
 
         return new GetPostsResponse(detailedPosts, simplePage);
     }
@@ -97,6 +102,7 @@ public class PostController {
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -106,7 +112,11 @@ public class PostController {
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public GetPostResponse getPost(@PathVariable Long postId) {
-        DetailedPost detailedPost =  detailedPostOf(postService.getPost(postId));
+        /**
+         * author : 최민성
+         * TODO : 유저 구해야함
+         */
+        DetailedPost detailedPost = detailedPostOf(postService.getPost(postId), null);
 
         return new GetPostResponse(detailedPost);
     }
@@ -114,7 +124,10 @@ public class PostController {
     @ApiOperation("게시글 삭제")
     @DeleteMapping("/{postId}")
     public DeletePostResponse deletePost(@PathVariable Long postId) {
-        // TODO : 게시글 유저 아이디 확인하기
+        /**
+         * author : 최민성
+         * TODO : 게시글 유저 아이디 확인하기
+         */
         Long userId = 10L;
 
         Post post = postService.getPost(postId);
@@ -134,27 +147,62 @@ public class PostController {
     @ResponseStatus(HttpStatus.CREATED)
     public GetPostResponse insertLikeInPost(@PathVariable Long postId) {
         /**
-         * 현재 엔드포인트만 잡은 상태
+         * author : 최민성
+         * TODO : 유저 확인
+         * 1. 유저가 아니라 게스트일 경우
+         * - 게스트는 추천을 누를 수 없다는 exception
+         *
+         * 2. 토큰 값이 있을 경우
+         * - 토큰 값을 가지고 유저 정보 찾
          */
-        return null;
-    }
+        User user = User.builder()
+                .identification("test")
+                .nickname("test")
+                .hashedPassword("test")
+                .build();
+        user = userRepository.save(user);
 
-    private List<DetailedPost> detailedPostsOf(List<Post> posts) {
+        Post post = postService.insertLikeInPost(user, postId);
+
+        return new GetPostResponse(detailedPostOf(post, user.getId()));
+   }
+
+    private List<DetailedPost> detailedPostsOf(List<Post> posts, Long userId) {
         List<DetailedPost> detailedPosts = new ArrayList<>();
-        posts.forEach(post -> detailedPosts.add(detailedPostOf(post)));
+        posts.forEach(post -> detailedPosts.add(detailedPostOf(post, userId)));
 
         return detailedPosts;
     }
 
-    private DetailedPost detailedPostOf(Post post) {
+    private DetailedPost detailedPostOf(Post post, Long userId) {
         DetailedPost detailedPost = new DetailedPost(post);
-        // TODO 1: PostLikeService를 통해 좋아요 수 찾기(아래 코드는 가데이터)
-        detailedPost.setLikes(10);
-        // TODO 2: PostBookmarService를 통해 북마크 수 찾기(아래 코드는 가데이터)
-        detailedPost.setBookMarks(3);
-        // TODO 3 : 자신의 추천 정보
-        detailedPost.setIsPressLike(false);
+        detailedPost.setLikes(findPostLikeCount(post.getId()));
+        detailedPost.setComments(findPostCommentCount(post.getId()));
+        detailedPost.setBookMarks(findPostBookmarkCount(post.getId()));
+        if (userId != null)
+            detailedPost.setIsPressLike(checkUserPressLike(userId, post.getId()));
 
         return detailedPost;
     }
+
+    private int findPostLikeCount(Long postId) {
+        return postService.countPostLike(postId);
+    }
+
+    private int findPostCommentCount(Long postId) {
+        return commentService.findCommentCount(postId);
+    }
+
+    private int findPostBookmarkCount(Long postId) {
+        /**
+         * author : 최민성
+         * TODO : 북마크 갯수
+         */
+        return 0;
+    }
+
+    private boolean checkUserPressLike(Long userId, Long postId) {
+        return postService.checkUserPressLike(userId, postId);
+    }
+
 }

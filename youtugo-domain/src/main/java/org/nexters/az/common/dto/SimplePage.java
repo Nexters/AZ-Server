@@ -11,7 +11,7 @@ public class SimplePage {
 
     @Builder
     public SimplePage(int currentPage, int totalPages, long totalElements) {
-        this.currentPage = currentPage;
+        this.currentPage = currentPage + 1;
         this.totalPages = totalPages;
         this.totalElements = totalElements;
     }

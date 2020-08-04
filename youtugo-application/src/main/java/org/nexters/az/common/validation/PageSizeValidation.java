@@ -1,7 +1,6 @@
 package org.nexters.az.common.validation;
 
 import org.nexters.az.common.exception.PageSizeRangeException;
-import org.nexters.az.sample.exception.TestNoFoundException;
 import org.nexters.az.validator.Validator;
 
 public class PageSizeValidation extends Validator<Integer> {
@@ -10,7 +9,7 @@ public class PageSizeValidation extends Validator<Integer> {
     }
 
     @Override
-    public boolean test(Integer page) {
-        return page >= 1;
+    public boolean test(Integer pageSize) {
+        return pageSize >= 1;
     }
 }

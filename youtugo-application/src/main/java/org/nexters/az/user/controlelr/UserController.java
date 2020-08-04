@@ -22,6 +22,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public GetRatingResponse getRating(@PathVariable Long userId) {
         /**
+         * authro : 최민성
          * TODO : 유저 권한 체크
          */
         return new GetRatingResponse(userService.updateRating(userId));
@@ -32,6 +33,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getUserPosts(@PathVariable Long userId) {
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -42,6 +44,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public GetCommentsResponse getUserComments(@PathVariable Long userId) {
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -52,6 +55,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getBookmarkPosts(@PathVariable Long userId) {
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -62,6 +66,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public GetPostResponse addBookmarkPost(@PathVariable Long userId, @PathVariable Long postId) {
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -72,6 +77,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public DeleteBookmarkPostResponse deleteBookmarkPost(@PathVariable Long userId, @PathVariable Long postId) {
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;

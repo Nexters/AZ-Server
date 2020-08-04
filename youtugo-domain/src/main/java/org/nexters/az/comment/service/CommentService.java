@@ -27,11 +27,11 @@ public class CommentService {
         return commentRepository.findAllByPostId(post.getId(), pageable);
     }
 
-    public ResponseEntity deleteComment(User deleter, Long commentId) {
+    public void deleteComment(User deleter, Long commentId) {
         Comment commentForDelete = commentRepository.findById(commentId, Comment.class).orElseThrow(CommentNotFoundException::new);
         checkWriter(deleter.getId(), commentForDelete.getId());
         commentRepository.delete(commentForDelete);
-        return ResponseEntity.noContent().build();
+        return;
     }
 
     public Comment modifyComment(User modifier, Long commentId, Comment modifyComment){
@@ -39,6 +39,10 @@ public class CommentService {
         checkWriter(modifier.getId(), commentForModify.getId());
         commentForModify.modifyComment(modifyComment.getComment());
         return commentRepository.save(commentForModify);
+    }
+
+    public int findCommentCount(Long postId) {
+        return commentRepository.countAllByPostId(postId);
     }
 
     private void checkWriter(Long accessId, Long writerId) {
