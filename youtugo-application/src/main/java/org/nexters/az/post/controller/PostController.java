@@ -29,8 +29,10 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final CommentService commentService;
-
-    // TODO 1 : 삭제예정
+    /**
+     * author : 최민성
+     * TODO : 삭제예정
+     */
     private final UserRepository userRepository;
 
     @ApiOperation("게시글 작성")
@@ -40,7 +42,10 @@ public class PostController {
         @RequestHeader String accessToken,
         @RequestBody WritePostRequest writePostRequest
     ) {
-        // TODO 1: 추후 accessToken으로 사용자를 찾기(아래 코드는 가데이터)
+        /**
+         * author : 최민성
+         * TODO : 추후 accessToken으로 사용자를 찾기(아래 코드는 가데이터)
+         */
         User user = User.builder()
                 .identification("test")
                 .nickname("test")
@@ -64,7 +69,10 @@ public class PostController {
         @RequestParam(required = false, defaultValue = "1") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        // TODO : 유저 구해야함
+        /**
+         * author : 최민성
+         * TODO : 유저 구해야함
+         */
 
         CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
 
@@ -93,8 +101,8 @@ public class PostController {
         @RequestParam(required = false, defaultValue = "1") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        // TODO : 유저 구해야함
         /**
+         * author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -104,7 +112,10 @@ public class PostController {
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public GetPostResponse getPost(@PathVariable Long postId) {
-        // TODO : 유저 구해야함
+        /**
+         * author : 최민성
+         * TODO : 유저 구해야함
+         */
         DetailedPost detailedPost = detailedPostOf(postService.getPost(postId), null);
 
         return new GetPostResponse(detailedPost);
@@ -113,7 +124,10 @@ public class PostController {
     @ApiOperation("게시글 삭제")
     @DeleteMapping("/{postId}")
     public DeletePostResponse deletePost(@PathVariable Long postId) {
-        // TODO : 게시글 유저 아이디 확인하기
+        /**
+         * author : 최민성
+         * TODO : 게시글 유저 아이디 확인하기
+         */
         Long userId = 10L;
 
         Post post = postService.getPost(postId);
@@ -133,6 +147,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.CREATED)
     public GetPostResponse insertLikeInPost(@PathVariable Long postId) {
         /**
+         * author : 최민성
          * TODO : 유저 확인
          * 1. 유저가 아니라 게스트일 경우
          * - 게스트는 추천을 누를 수 없다는 exception
@@ -179,7 +194,10 @@ public class PostController {
     }
 
     private int findPostBookmarkCount(Long postId) {
-        // TODO : 북마크 갯수
+        /**
+         * author : 최민성
+         * TODO : 북마크 갯수
+         */
         return 0;
     }
 
