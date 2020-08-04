@@ -37,4 +37,8 @@ public class User {
     public void setRating(Rating rating) {
         this.rating = rating;
     }
+
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
 }

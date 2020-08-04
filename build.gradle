@@ -4,6 +4,7 @@ buildscript {
         junitVersion = '4.12'
         swaggerVersion = '2.9.2'
         mysqlVersion = '8.0.17'
+        jwtVersion = '0.10.5'
     }
 }
 
