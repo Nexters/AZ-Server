@@ -7,6 +7,8 @@ import org.nexters.az.post.repository.PostRepository;
 import org.nexters.az.user.dto.RatingForPromotion;
 import org.nexters.az.user.entity.Rating;
 import org.nexters.az.user.entity.User;
+import org.nexters.az.user.exception.AlreadyIdentificationExistException;
+import org.nexters.az.user.exception.AlreadyNicknameExistException;
 import org.nexters.az.user.exception.NonExistentUserException;
 import org.nexters.az.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+
+    public void checkUserNicknameExist(String nickname) {
+        if (userRepository.existsByNickname(nickname))
+            throw new AlreadyNicknameExistException();
+    }
+
+    public void checkUserIdentificationExist(String identification) {
+        if (userRepository.existsByIdentification(identification))
+            throw new AlreadyIdentificationExistException();
+    }
 
     public RatingForPromotion updateRating(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(NonExistentUserException::new);

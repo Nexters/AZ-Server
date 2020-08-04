@@ -17,6 +17,20 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @ApiOperation("아이디 중복 체크")
+    @PostMapping("/identifications/{identification}/existence")
+    @ResponseStatus(HttpStatus.OK)
+    public void checkIdentificationExist(@PathVariable String identification) {
+        userService.checkUserIdentificationExist(identification);
+    }
+
+    @ApiOperation("닉네임 중복 체크")
+    @PostMapping("/nicknames/{nickname}/existence")
+    @ResponseStatus(HttpStatus.OK)
+    public void checkNicknameExist(@PathVariable String nickname) {
+        userService.checkUserNicknameExist(nickname);
+    }
+
     @ApiOperation("등급 조건 조회")
     @GetMapping("/{userId}/rating")
     @ResponseStatus(HttpStatus.OK)
