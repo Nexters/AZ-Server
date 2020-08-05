@@ -2,6 +2,8 @@ package org.nexters.az.post.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.nexters.az.auth.security.TokenSubject;
+import org.nexters.az.auth.service.AuthService;
 import org.nexters.az.comment.service.CommentService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
@@ -13,7 +15,6 @@ import org.nexters.az.post.request.WritePostRequest;
 import org.nexters.az.post.response.*;
 import org.nexters.az.post.service.PostService;
 import org.nexters.az.user.entity.User;
-import org.nexters.az.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,11 +30,7 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final CommentService commentService;
-    /**
-     * author : 최민성
-     * TODO : 삭제예정
-     */
-    private final UserRepository userRepository;
+    private final AuthService authService;
 
     @ApiOperation("게시글 작성")
     @PostMapping("/post")
@@ -42,16 +39,7 @@ public class PostController {
         @RequestHeader String accessToken,
         @RequestBody WritePostRequest writePostRequest
     ) {
-        /**
-         * author : 최민성
-         * TODO : 추후 accessToken으로 사용자를 찾기(아래 코드는 가데이터)
-         */
-        User user = User.builder()
-                .identification("test")
-                .nickname("test")
-                .hashedPassword("test")
-                .build();
-        user = userRepository.save(user);
+        User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = Post.builder()
                 .author(user)
@@ -66,13 +54,14 @@ public class PostController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getPosts(
+        @RequestHeader(required = false, defaultValue = "") String accessToken,
         @RequestParam(required = false, defaultValue = "1") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        /**
-         * author : 최민성
-         * TODO : 유저 구해야함
-         */
+        Long userId = null;
+        if(!accessToken.equals("")) {
+            userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
+        }
 
         CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
 
@@ -89,7 +78,7 @@ public class PostController {
                 .totalPages(searchResult.getTotalPages())
                 .totalElements(searchResult.getTotalElements())
                 .build();
-        List<DetailedPost> detailedPosts = detailedPostsOf(searchResult.getContent(), null);
+        List<DetailedPost> detailedPosts = detailedPostsOf(searchResult.getContent(), userId);
 
         return new GetPostsResponse(detailedPosts, simplePage);
     }
@@ -98,11 +87,17 @@ public class PostController {
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getPopularPosts(
+        @RequestHeader(required = false, defaultValue = "") String accessToken,
         @RequestParam(required = false, defaultValue = "1") int currentPage,
         @RequestParam(required = false, defaultValue = "10") int size
     ) {
+        Long userId = null;
+        if(!accessToken.equals("")) {
+            userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
+        }
+
         /**
-         * author : 최민성
+         * @author : 최민성
          * 현재 엔드포인트만 잡은 상태
          */
         return null;
@@ -111,24 +106,27 @@ public class PostController {
     @ApiOperation("게시글 상세보기")
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
-    public GetPostResponse getPost(@PathVariable Long postId) {
-        /**
-         * author : 최민성
-         * TODO : 유저 구해야함
-         */
-        DetailedPost detailedPost = detailedPostOf(postService.getPost(postId), null);
+    public GetPostResponse getPost(
+        @RequestHeader(required = false, defaultValue = "") String accessToken,
+        @PathVariable Long postId
+    ) {
+        Long userId = null;
+        if(!accessToken.equals("")) {
+            userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
+        }
+
+        DetailedPost detailedPost = detailedPostOf(postService.getPost(postId), userId);
 
         return new GetPostResponse(detailedPost);
     }
 
     @ApiOperation("게시글 삭제")
     @DeleteMapping("/{postId}")
-    public DeletePostResponse deletePost(@PathVariable Long postId) {
-        /**
-         * author : 최민성
-         * TODO : 게시글 유저 아이디 확인하기
-         */
-        Long userId = 10L;
+    public DeletePostResponse deletePost(
+        @RequestHeader String accessToken,
+        @PathVariable Long postId
+    ) {
+        Long userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.getPost(postId);
         if(!post.getAuthor().getId().equals(userId)) {
@@ -145,22 +143,11 @@ public class PostController {
     @ApiOperation("게시글 추천")
     @PostMapping("/{postId}/likes")
     @ResponseStatus(HttpStatus.CREATED)
-    public GetPostResponse insertLikeInPost(@PathVariable Long postId) {
-        /**
-         * author : 최민성
-         * TODO : 유저 확인
-         * 1. 유저가 아니라 게스트일 경우
-         * - 게스트는 추천을 누를 수 없다는 exception
-         *
-         * 2. 토큰 값이 있을 경우
-         * - 토큰 값을 가지고 유저 정보 찾
-         */
-        User user = User.builder()
-                .identification("test")
-                .nickname("test")
-                .hashedPassword("test")
-                .build();
-        user = userRepository.save(user);
+    public GetPostResponse insertLikeInPost(
+        @RequestHeader String accessToken,
+        @PathVariable Long postId
+    ) {
+        User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.insertLikeInPost(user, postId);
 
@@ -195,8 +182,9 @@ public class PostController {
 
     private int findPostBookmarkCount(Long postId) {
         /**
-         * author : 최민성
-         * TODO : 북마크 갯수
+         * @author : 최민성
+         * @Param : 게시글 id
+         * @retrun : bookmark 개수
          */
         return 0;
     }
