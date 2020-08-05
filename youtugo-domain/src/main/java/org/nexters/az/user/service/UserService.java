@@ -1,13 +1,16 @@
 package org.nexters.az.user.service;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.nexters.az.auth.security.SHA256Util;
 import org.nexters.az.comment.repository.CommentRepository;
 import org.nexters.az.post.repository.PostRepository;
 import org.nexters.az.user.dto.RatingForPromotion;
 import org.nexters.az.user.entity.Rating;
 import org.nexters.az.user.entity.User;
+import org.nexters.az.user.exception.AlreadyIdentificationExistException;
+import org.nexters.az.user.exception.AlreadyNicknameExistException;
 import org.nexters.az.user.exception.NonExistentUserException;
+import org.nexters.az.user.exception.IdentificationOrPasswordMismatchException;
 import org.nexters.az.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,32 @@ public class UserService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+
+    public User signUp(User user) {
+        checkUserNicknameExist(user.getIdentification());
+        checkUserIdentificationExist(user.getNickname());
+        user.setHashedPassword(SHA256Util.of(user.getHashedPassword()));
+        return userRepository.save(user);
+    }
+
+    public User signIn(String identification, String password) {
+        User user = userRepository.findByIdentification(identification).orElseThrow(IdentificationOrPasswordMismatchException::new);
+        if (!user.getHashedPassword().equals(SHA256Util.of(password))) {
+            throw new IdentificationOrPasswordMismatchException();
+        }
+
+        return user;
+    }
+
+    public void checkUserNicknameExist(String nickname) {
+        if (userRepository.existsAllByNickname(nickname))
+            throw new AlreadyNicknameExistException();
+    }
+
+    public void checkUserIdentificationExist(String identification) {
+        if (userRepository.existsAllByIdentification(identification))
+            throw new AlreadyIdentificationExistException();
+    }
 
     public RatingForPromotion updateRating(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(NonExistentUserException::new);
@@ -32,7 +61,7 @@ public class UserService {
     }
 
     public RatingForPromotion findRatingForPromotion(int postCount, int commentCount) {
-        Rating currentRating = null;
+        Rating currentRating;
         Rating nextRating = null;
         int postCountForPromotion = 0;
         int commentCountForPromotion = 0;

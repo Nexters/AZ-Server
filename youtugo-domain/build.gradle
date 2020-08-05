@@ -3,6 +3,9 @@ jar { enabled = true }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("io.jsonwebtoken:jjwt-api:${jwtVersion}")
+    runtime("io.jsonwebtoken:jjwt-impl:${jwtVersion}")
+    runtime("io.jsonwebtoken:jjwt-jackson:${jwtVersion}")
     compile group: 'mysql', name: 'mysql-connector-java', version: "${mysqlVersion}"
     runtimeOnly('com.h2database:h2')
 }
