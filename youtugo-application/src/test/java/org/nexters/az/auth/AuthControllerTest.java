@@ -111,7 +111,7 @@ public class AuthControllerTest extends CommonTest {
         ).andReturn();
 
         //then
-        assertEquals(404, mvcResult.getResponse().getStatus());
+        assertEquals(401, mvcResult.getResponse().getStatus());
     }
 
     @Test
