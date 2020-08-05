@@ -37,6 +37,7 @@ public class JWTTokenProvider {
         Date expireDate = new Date(now.getTime() + expirationDate);
 
         String token = Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setSubject("AccessToken")
                 .setIssuedAt(now)
@@ -56,6 +57,7 @@ public class JWTTokenProvider {
 
     private String generateRefreshToken(Map<String, Object> claims, String secretKey){
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setSubject("RefreshToken")
                 .setIssuedAt(new Date())

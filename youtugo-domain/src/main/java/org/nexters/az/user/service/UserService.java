@@ -10,7 +10,7 @@ import org.nexters.az.user.entity.User;
 import org.nexters.az.user.exception.AlreadyIdentificationExistException;
 import org.nexters.az.user.exception.AlreadyNicknameExistException;
 import org.nexters.az.user.exception.NonExistentUserException;
-import org.nexters.az.user.exception.PasswordMismatchException;
+import org.nexters.az.user.exception.IdentificationOrPasswordMismatchException;
 import org.nexters.az.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +31,9 @@ public class UserService {
     }
 
     public User signIn(String identification, String password) {
-        User user = userRepository.findByIdentification(identification).orElseThrow(NonExistentUserException::new);
+        User user = userRepository.findByIdentification(identification).orElseThrow(IdentificationOrPasswordMismatchException::new);
         if (!user.getHashedPassword().equals(SHA256Util.of(password))) {
-            throw new PasswordMismatchException();
+            throw new IdentificationOrPasswordMismatchException();
         }
 
         return user;
