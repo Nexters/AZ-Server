@@ -50,7 +50,7 @@ public class SignUpApiTest extends CommonTest {
         ).andReturn();
 
         //then
-        assertEquals(403, mvcResult.getResponse().getStatus());
+        assertEquals(409, mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class SignUpApiTest extends CommonTest {
         ).andReturn();
 
         //then
-        assertEquals(403, mvcResult.getResponse().getStatus());
+        assertEquals(409, mvcResult.getResponse().getStatus());
     }
 
 }

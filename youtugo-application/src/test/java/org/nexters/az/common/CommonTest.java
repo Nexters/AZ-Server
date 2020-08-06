@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.nexters.az.auth.request.SignUpRequest;
 import org.nexters.az.auth.response.SignInResponse;
+import org.nexters.az.post.request.WritePostRequest;
+import org.nexters.az.post.response.GetPostResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -34,6 +37,8 @@ public abstract class CommonTest {
 
     protected final String AUTH_URL = URL + port + "/v1/api/auth";
 
+    protected final String USER_URL = URL + port + "/v1/api/users";
+
     private static int testNO = 0;
 
     protected static final String COMMON_PW = "1234567890123456789012345678901234567890123456789012345678901234";
@@ -46,7 +51,24 @@ public abstract class CommonTest {
                 .build();
     }
 
-    protected SignInResponse createUser() throws Exception{
+    protected GetPostResponse createPost(String accessToken) throws Exception {
+        WritePostRequest writePostRequest = new WritePostRequest("test_success");
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(POST_URL + "/post")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("accessToken", accessToken)
+                        .content(objectMapper.writeValueAsString(writePostRequest))
+        ).andReturn();
+
+        return objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(),
+                GetPostResponse.class
+        );
+    }
+
+    protected SignInResponse createUser() throws Exception {
         SignUpRequest signUpRequest = createSignUpRequest();
         ObjectMapper objectMapper = new ObjectMapper();
         MvcResult mvcResult = mockMvc.perform(

@@ -133,6 +133,7 @@ public class PostController {
         if(!post.getAuthor().getId().equals(userId)) {
             throw new NoPermissionDeletePostException();
         }
+
         postService.deletePost(postId, userId);
     }
 
@@ -163,7 +164,7 @@ public class PostController {
         detailedPost.setComments(findPostCommentCount(post.getId()));
         detailedPost.setBookMarks(findPostBookmarkCount(post.getId()));
         if (userId != null)
-            detailedPost.setIsPressLike(checkUserPressLike(userId, post.getId()));
+            detailedPost.setPressLike(checkUserPressLike(userId, post.getId()));
 
         return detailedPost;
     }
