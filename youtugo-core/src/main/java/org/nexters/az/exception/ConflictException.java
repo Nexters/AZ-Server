@@ -9,6 +9,6 @@ public class ConflictException extends ResponseStatusException {
     }
 
     public ConflictException(String message){
-        super(HttpStatus.FORBIDDEN, message);
+        super(HttpStatus.CONFLICT, message);
     }
 }

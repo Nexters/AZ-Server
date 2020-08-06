@@ -1,11 +1,15 @@
 package org.nexters.az.post.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.nexters.az.post.entity.Post;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor
 public class DetailedPost {
     private Long id;
     private String authorNickname;
@@ -13,8 +17,12 @@ public class DetailedPost {
     private int likes;
     private int bookMarks;
     private int comments;
-    private boolean isPressLike;
+    private boolean pressLike;
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdDate;
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedDate;
 
     public DetailedPost(Post post) {
@@ -23,7 +31,7 @@ public class DetailedPost {
         this.content = post.getContent();
         this.createdDate = post.getCreatedDate();
         this.modifiedDate = post.getModifiedDate();
-        this.isPressLike = false;
+        this.pressLike = false;
     }
 
     public void setLikes(int likes) {
@@ -34,8 +42,8 @@ public class DetailedPost {
         this.bookMarks = bookMarks;
     }
 
-    public void setIsPressLike(boolean isPressLike) {
-        this.isPressLike = isPressLike;
+    public void setPressLike(boolean pressLike) {
+        this.pressLike = pressLike;
     }
 
     public void setComments(int comments) {
