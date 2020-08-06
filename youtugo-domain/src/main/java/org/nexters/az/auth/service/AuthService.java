@@ -16,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthService {
-    @Value("${secrets.JWT_KEY}")
+    @Value("${{ secrets.JWT_KEY }}")
     private String secretKey;
 
-    @Value("${secrets.JWT_EXPIRATION}")
+    @Value("${{ secrets.JWT_EXPIRATION }}")
     private int expirationDate;
 
     private final UserRepository userRepository;
