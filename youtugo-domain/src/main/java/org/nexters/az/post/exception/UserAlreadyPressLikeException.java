@@ -1,8 +1,8 @@
 package org.nexters.az.post.exception;
 
-import org.nexters.az.exception.UnauthorizedException;
+import org.nexters.az.exception.ConflictException;
 
-public class UserAlreadyPressLikeException extends UnauthorizedException {
+public class UserAlreadyPressLikeException extends ConflictException {
     public UserAlreadyPressLikeException() {
         this("User already press like");
     }
