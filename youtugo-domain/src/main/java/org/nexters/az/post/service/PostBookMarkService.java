@@ -3,6 +3,7 @@ package org.nexters.az.post.service;
 import lombok.RequiredArgsConstructor;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.entity.PostBookMark;
+import org.nexters.az.post.exception.NonExistentBookMarkException;
 import org.nexters.az.post.exception.NonExistentPostException;
 import org.nexters.az.post.exception.UserAlreadyPressBookMarkException;
 import org.nexters.az.post.repository.PostBookMarkRepository;
@@ -51,5 +52,11 @@ public class PostBookMarkService {
 
     public int countPostBookMark(Long postId) {
         return postBookMarkRepository.countPostBookMarksByPostId(postId);
+    }
+
+    public boolean deleteBookMark(User user, Long postId) {
+        PostBookMark postBookMark = postBookMarkRepository.findByUserIdAndPostId(user.getId(),postId).orElseThrow(NonExistentBookMarkException::new);
+        postBookMarkRepository.delete(postBookMark);
+        return true;
     }
 }
