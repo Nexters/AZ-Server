@@ -122,7 +122,8 @@ public class PostController {
 
     @ApiOperation("게시글 삭제")
     @DeleteMapping("/{postId}")
-    public DeletePostResponse deletePost(
+    @ResponseStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
+    public void deletePost(
         @RequestHeader String accessToken,
         @PathVariable Long postId
     ) {
@@ -133,11 +134,6 @@ public class PostController {
             throw new NoPermissionDeletePostException();
         }
         postService.deletePost(postId, userId);
-
-        boolean isDeleted = !postService.checkExistPost(postId);
-
-
-        return new DeletePostResponse(isDeleted);
     }
 
     @ApiOperation("게시글 추천")

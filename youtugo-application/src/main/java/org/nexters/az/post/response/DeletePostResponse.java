@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class DeletePostResponse {
-   private boolean isDeleted;
+   private String message;
 }
