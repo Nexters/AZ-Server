@@ -1,7 +1,6 @@
 package org.nexters.az.common.validation;
 
 import org.nexters.az.common.exception.CurrentPageRangeException;
-import org.nexters.az.sample.exception.TestNoFoundException;
 import org.nexters.az.validator.Validator;
 
 public class CurrentPageValidation extends Validator<Integer> {

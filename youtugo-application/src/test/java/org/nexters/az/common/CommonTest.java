@@ -1,13 +1,10 @@
 package org.nexters.az.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.nexters.az.auth.dto.AccessToken;
 import org.nexters.az.auth.request.SignUpRequest;
 import org.nexters.az.auth.response.SignInResponse;
-import org.nexters.az.user.dto.SimpleUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -33,9 +30,14 @@ public abstract class CommonTest {
 
     protected final String URL = "http://localhost:";
 
+    protected final String POST_URL = URL + port + "/v1/api/posts";
+
+    protected final String AUTH_URL = URL + port + "/v1/api/auth";
+
     private static int testNO = 0;
 
     protected static final String COMMON_PW = "1234567890123456789012345678901234567890123456789012345678901234";
+
 
     @Before
     public void setup() {
