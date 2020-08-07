@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,8 +51,6 @@ public class CommentController {
                         .post(post)
                         .writer(writer)
                         .comment(writeCommentRequest.getComment())
-                        .created_At(LocalDateTime.now())
-                        .modify_At(LocalDateTime.now())
                         .build()));
 
         return new WriteCommentResponse(detailedComment);
@@ -91,6 +88,7 @@ public class CommentController {
 
     @ApiOperation("댓글 수정")
     @PatchMapping("/{postId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.OK)
     public ModifyCommentResponse modifyComment(@PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @RequestBody ModifyCommentRequest modifyCommentRequest,

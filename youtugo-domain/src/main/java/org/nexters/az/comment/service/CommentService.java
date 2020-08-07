@@ -37,7 +37,7 @@ public class CommentService {
     public Comment modifyComment(User modifier, Long postId, Long commentId, Comment modifyComment){
         Comment commentForModify = commentRepository.findByPostIdAndId(postId, commentId).orElseThrow(NonExistentCommentException::new);
         checkWriter(modifier.getId(), commentForModify.getWriter().getId());
-        commentForModify.modifyComment(modifyComment.getComment(), LocalDateTime.now());
+        commentForModify.modifyComment(modifyComment.getComment());
         return commentRepository.save(commentForModify);
     }
 
