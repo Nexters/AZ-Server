@@ -44,14 +44,14 @@ public class UserController {
 
     @ApiOperation("닉네임 중복 체크")
     @PostMapping("/nicknames/{nickname}/existence")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void checkNicknameExist(@PathVariable String nickname) {
         userService.checkUserNicknameExist(nickname);
     }
 
     @ApiOperation("아이디 중복 체크")
     @PostMapping("/identifications/{identification}/existence")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void checkIdentificationExist(@PathVariable String identification) {
         userService.checkUserIdentificationExist(identification);
     }
@@ -153,7 +153,7 @@ public class UserController {
         detailedPost.setLikes(postService.countPostLike(post.getId()));
         detailedPost.setBookMarks(postBookMarkService.countPostBookMark(post.getId()));
         detailedPost.setLikes(commentService.findCommentCount(post.getId()));
-        detailedPost.setIsPressLike(postService.checkUserPressLike(userId, post.getId()));
+        detailedPost.setPressLike(postService.checkUserPressLike(userId, post.getId()));
 
         return detailedPost;
     }
