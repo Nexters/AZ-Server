@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.az.post.entity.Post;
+import org.nexters.az.user.dto.SimpleUser;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DetailedPost {
     private Long id;
-    private String authorNickname;
+    private SimpleUser author;
     private String content;
     private int likes;
     private int bookMarks;
@@ -27,7 +28,7 @@ public class DetailedPost {
 
     public DetailedPost(Post post) {
         this.id = post.getId();
-        this.authorNickname = post.getAuthor().getNickname();
+        this.author = SimpleUser.of(post.getAuthor());
         this.content = post.getContent();
         this.createdDate = post.getCreatedDate();
         this.modifiedDate = post.getModifiedDate();
@@ -48,5 +49,9 @@ public class DetailedPost {
 
     public void setComments(int comments) {
         this.comments = comments;
+    }
+
+    public void makeSimpleContent() {
+        content = content.replace('\n', ' ').replaceAll("( )+", " ");
     }
 }

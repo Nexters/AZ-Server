@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.nexters.az.auth.security.TokenSubject;
 import org.nexters.az.auth.service.AuthService;
-import org.nexters.az.comment.service.CommentService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
@@ -29,7 +28,6 @@ import java.util.List;
 @RequestMapping("v1/api/posts")
 public class PostController {
     private final PostService postService;
-    private final CommentService commentService;
     private final AuthService authService;
 
     @ApiOperation("게시글 작성")
@@ -47,7 +45,7 @@ public class PostController {
                 .build();
         post = postService.create(post);
 
-        return new WritePostResponse(detailedPostOf(post, user.getId()));
+        return new WritePostResponse(postService.detailedPostOf(post, user.getId()));
     }
 
     @ApiOperation("게시글들 조회")
@@ -115,7 +113,7 @@ public class PostController {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
-        DetailedPost detailedPost = detailedPostOf(postService.getPost(postId), userId);
+        DetailedPost detailedPost = postService.detailedPostOf(postService.getPost(postId), userId);
 
         return new GetPostResponse(detailedPost);
     }
@@ -148,46 +146,15 @@ public class PostController {
 
         Post post = postService.insertLikeInPost(user, postId);
 
-        return new GetPostResponse(detailedPostOf(post, user.getId()));
+        return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
    }
 
     private List<DetailedPost> detailedPostsOf(List<Post> posts, Long userId) {
         List<DetailedPost> detailedPosts = new ArrayList<>();
-        posts.forEach(post -> detailedPosts.add(detailedPostOf(post, userId)));
+        posts.forEach(post -> detailedPosts.add(postService.detailedPostOf(post, userId)));
+        detailedPosts.forEach(DetailedPost::makeSimpleContent);
 
         return detailedPosts;
-    }
-
-    private DetailedPost detailedPostOf(Post post, Long userId) {
-        DetailedPost detailedPost = new DetailedPost(post);
-        detailedPost.setLikes(findPostLikeCount(post.getId()));
-        detailedPost.setComments(findPostCommentCount(post.getId()));
-        detailedPost.setBookMarks(findPostBookmarkCount(post.getId()));
-        if (userId != null)
-            detailedPost.setPressLike(checkUserPressLike(userId, post.getId()));
-
-        return detailedPost;
-    }
-
-    private int findPostLikeCount(Long postId) {
-        return postService.countPostLike(postId);
-    }
-
-    private int findPostCommentCount(Long postId) {
-        return commentService.findCommentCount(postId);
-    }
-
-    private int findPostBookmarkCount(Long postId) {
-        /**
-         * @author : 최민성
-         * @Param : 게시글 id
-         * @retrun : bookmark 개수
-         */
-        return 0;
-    }
-
-    private boolean checkUserPressLike(Long userId, Long postId) {
-        return postService.checkUserPressLike(userId, postId);
     }
 
 }
