@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -60,6 +59,19 @@ public abstract class CommonTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("accessToken", accessToken)
                         .content(objectMapper.writeValueAsString(writePostRequest))
+        ).andReturn();
+
+        return objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(),
+                GetPostResponse.class
+        );
+    }
+
+    protected GetPostResponse addBookMark(String accessToken, Long postId) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        MvcResult mvcResult = mockMvc.perform(
+                post(USER_URL + "/bookmark/posts/"+ postId)
+                .header("accessToken", accessToken)
         ).andReturn();
 
         return objectMapper.readValue(
