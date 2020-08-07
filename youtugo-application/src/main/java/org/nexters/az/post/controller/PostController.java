@@ -154,6 +154,7 @@ public class PostController {
     private List<DetailedPost> detailedPostsOf(List<Post> posts, Long userId) {
         List<DetailedPost> detailedPosts = new ArrayList<>();
         posts.forEach(post -> detailedPosts.add(detailedPostOf(post, userId)));
+        detailedPosts.forEach(DetailedPost::makeSimpleContent);
 
         return detailedPosts;
     }
