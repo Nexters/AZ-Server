@@ -49,4 +49,24 @@ public class DeleteCommentApiTest extends CommonTest {
         //then
         assertEquals(403,mvcResult.getResponse().getStatus());
     }
+
+    @Test
+    public void testDeleteCommentFailBecauseNonExistentCommentException() throws Exception {
+
+        //given
+        String accessToken = createUser().getAccessToken().getToken();
+        String writerAccessToken = createUser().getAccessToken().getToken();
+        Long postId = createPost(writerAccessToken).getDetailedPost().getId();
+        WriteCommentResponse writeCommentResponse = createComment(postId,accessToken);
+        Long wrongCommentId = 10000L;
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(
+                delete(POST_URL+"/"+postId+"/comments/"+wrongCommentId)
+                        .header("accessToken",accessToken)
+        ).andReturn();
+
+        //then
+        assertEquals(404,mvcResult.getResponse().getStatus());
+    }
 }

@@ -28,9 +28,9 @@ public class CommentService {
         return commentRepository.findAllByPostId(post.getId(), pageable);
     }
 
-    public void deleteComment(User deleter, Long postId, Long commentId) {
+    public void deleteComment(Long deleterId, Long postId, Long commentId) {
         Comment commentForDelete = commentRepository.findByPostIdAndId(postId, commentId).orElseThrow(NonExistentCommentException::new);
-        checkWriter(deleter.getId(), commentForDelete.getWriter().getId());
+        checkWriter(deleterId, commentForDelete.getWriter().getId());
         commentRepository.delete(commentForDelete);
     }
 

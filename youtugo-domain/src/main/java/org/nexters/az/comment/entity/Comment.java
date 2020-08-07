@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "comments")
-public class Comment extends BaseTime{
+public class Comment extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,12 +25,11 @@ public class Comment extends BaseTime{
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name="writer_id")
+    @JoinColumn(name = "writer_id")
     private User writer;
 
     @Column(nullable = false)
     private String comment;
-
 
     @Builder
     public Comment(Post post, User writer, String comment) {
@@ -40,6 +39,6 @@ public class Comment extends BaseTime{
     }
 
     public void modifyComment(String comment) {
-       this.comment = comment;
+        this.comment = comment;
     }
 }

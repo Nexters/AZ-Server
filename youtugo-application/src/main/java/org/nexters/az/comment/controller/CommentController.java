@@ -92,9 +92,9 @@ public class CommentController {
     public ModifyCommentResponse modifyComment(@PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @RequestBody ModifyCommentRequest modifyCommentRequest,
-                                               @RequestHeader String accessToken){
+                                               @RequestHeader String accessToken) {
 
-        User modifier = authService.findUserByToken(accessToken,TokenSubject.ACCESS_TOKEN);
+        User modifier = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Comment modifyComment = ModifyCommentRequest.toEntity(modifyCommentRequest);
         DetailedComment detailedComment = DetailedComment.detailedCommentOf(commentService.modifyComment(modifier, postId, commentId, modifyComment));
@@ -104,11 +104,11 @@ public class CommentController {
     @ApiOperation("댓글 삭제")
     @DeleteMapping("/{postId}/comments/{commentId}")
     public void deleteComment(@PathVariable Long postId,
-                                 @PathVariable Long commentId,
-                                 @RequestHeader String accessToken) {
+                              @PathVariable Long commentId,
+                              @RequestHeader String accessToken) {
 
-        User deleter = authService.findUserByToken(accessToken,TokenSubject.ACCESS_TOKEN);
+        Long deleterId = authService.findUserIdBy(accessToken,TokenSubject.ACCESS_TOKEN);
 
-        commentService.deleteComment(deleter, postId, commentId);
+        commentService.deleteComment(deleterId, postId, commentId);
     }
 }
