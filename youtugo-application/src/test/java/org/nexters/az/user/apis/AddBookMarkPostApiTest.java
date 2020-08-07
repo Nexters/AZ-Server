@@ -19,7 +19,7 @@ public class AddBookMarkPostApiTest extends CommonTest {
 
         //when
         MvcResult mvcResult = mockMvc.perform(
-                post(USER_URL + "/bookmark/" + postId)
+                post(USER_URL + "/bookmark/posts/" + postId)
                         .header("accessToken", accessToken)
         ).andReturn();
 
@@ -36,7 +36,7 @@ public class AddBookMarkPostApiTest extends CommonTest {
 
         //when
         MvcResult mvcResult = mockMvc.perform(
-                post(USER_URL + "/bookmark/" + postId)
+                post(USER_URL + "/bookmark/posts/" + postId)
                         .header("accessToken", "tokenNotFound")
         ).andReturn();
 

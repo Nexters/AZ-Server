@@ -70,7 +70,7 @@ public abstract class CommonTest {
     protected GetPostResponse addBookMark(String accessToken, Long postId) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         MvcResult mvcResult = mockMvc.perform(
-                post(USER_URL + "/bookmark/"+ postId)
+                post(USER_URL + "/bookmark/posts/"+ postId)
                 .header("accessToken", accessToken)
         ).andReturn();
 
