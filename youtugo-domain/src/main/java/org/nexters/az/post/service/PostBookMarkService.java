@@ -54,9 +54,9 @@ public class PostBookMarkService {
         return postBookMarkRepository.countPostBookMarksByPostId(postId);
     }
 
-    public boolean deleteBookMark(User user, Long postId) {
-        PostBookMark postBookMark = postBookMarkRepository.findByUserIdAndPostId(user.getId(),postId).orElseThrow(NonExistentBookMarkException::new);
+    public void deleteBookMark(User user, Post post) {
+        PostBookMark postBookMark = postBookMarkRepository.findByUserIdAndPostId(user.getId(),
+                post.getId()).orElseThrow(NonExistentBookMarkException::new);
         postBookMarkRepository.delete(postBookMark);
-        return true;
     }
 }

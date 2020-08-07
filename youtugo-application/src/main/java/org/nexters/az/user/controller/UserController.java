@@ -19,7 +19,6 @@ import org.nexters.az.post.service.PostBookMarkService;
 import org.nexters.az.post.service.PostService;
 import org.nexters.az.user.entity.User;
 import org.nexters.az.user.exception.NoPermissionBookMarkException;
-import org.nexters.az.user.response.DeleteBookmarkPostResponse;
 import org.nexters.az.user.response.GetRatingResponse;
 import org.nexters.az.user.service.UserService;
 import org.springframework.data.domain.Page;
@@ -67,8 +66,8 @@ public class UserController {
         return new GetRatingResponse(userService.updateRating(userId));
     }
 
-    @ApiOperation("게시글 북마크 조회")
-    @GetMapping("/{userId}/bookmark/posts)")
+    @ApiOperation("내가 북마크한 글 조회")
+    @GetMapping("/{userId}/bookmark/posts")
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getBookmarkPosts(@RequestHeader String accessToken, @PathVariable Long userId,
                                              @RequestParam(required = false, defaultValue = "1") int currentPage,
@@ -77,13 +76,13 @@ public class UserController {
         CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
 
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
-        checkUserIdForBookMark(userId, user);
+        checkUserIdForBookMark(userId, user.getId());
 
         Page<PostBookMark> searchBookMarks = postBookMarkService.getBookMarks(userId,
                 PageRequest.of(
                         currentPageAndPageSize.getCurrentPage() - 1,
                         currentPageAndPageSize.getPageSize(),
-                        Sort.by("createdDate").descending()
+                        Sort.by("id").descending()
                 )
         );
 
@@ -97,31 +96,31 @@ public class UserController {
     }
 
     @ApiOperation("게시글 북마크 추가")
-    @PostMapping("/{userId}/bookmark/posts)")
+    @PostMapping("/bookmark/{postId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public GetPostResponse addBookmarkPost(@RequestHeader String accessToken, @PathVariable Long userId, @PathVariable Long postId) {
+    public GetPostResponse addBookmarkPost(@RequestHeader String accessToken, @PathVariable Long postId) {
 
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
-        checkUserIdForBookMark(userId, user);
 
         Post post = postBookMarkService.insertBookMarkInPost(user, postId);
 
-        return new GetPostResponse(detailedPostOf(post, userId));
+        return new GetPostResponse(detailedPostOf(post, user.getId()));
     }
 
     @ApiOperation("게시글 북마크 취소")
-    @DeleteMapping("/{userId}/bookmark/posts/{postId)")
+    @DeleteMapping("/bookmark/posts/{postId}")
     @ResponseStatus(HttpStatus.OK)
-    public DeleteBookmarkPostResponse deleteBookmarkPost(@RequestHeader String accessToken, @PathVariable Long userId, @PathVariable Long postId) {
+    public void deleteBookmarkPost(@RequestHeader String accessToken, @PathVariable Long postId) {
 
-        User user = authService.findUserByToken(accessToken,TokenSubject.ACCESS_TOKEN);
-        checkUserIdForBookMark(userId,user);
+        User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
-        return new DeleteBookmarkPostResponse(postBookMarkService.deleteBookMark(user,postId));
+        Post post = postService.getPost(postId);
+
+        postBookMarkService.deleteBookMark(user,post);
     }
 
     @ApiOperation("내가 작성한 글 조회")
-    @GetMapping("/{userId}/posts)")
+    @GetMapping("/{userId}/posts")
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getUserPosts(@PathVariable Long userId) {
         /**
@@ -142,8 +141,8 @@ public class UserController {
         return null;
     }
 
-    public void checkUserIdForBookMark(Long userId, User user) {
-        if (!userId.equals(user.getId())) {
+    public void checkUserIdForBookMark(Long userId, Long accessTokenUserId) {
+        if (!userId.equals(accessTokenUserId)) {
             throw new NoPermissionBookMarkException();
         }
     }
