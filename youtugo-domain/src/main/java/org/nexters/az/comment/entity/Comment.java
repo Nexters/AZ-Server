@@ -9,6 +9,7 @@ import org.nexters.az.post.entity.Post;
 import org.nexters.az.user.entity.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -30,14 +31,23 @@ public class Comment extends BaseTime {
     @Column(nullable = false)
     private String comment;
 
+    @Column(nullable = false)
+    private LocalDateTime created_At;
+
+    @Column(nullable = false)
+    private LocalDateTime modify_At;
+
     @Builder
-    public Comment(Post post, User writer, String comment) {
+    public Comment(Post post, User writer, String comment, LocalDateTime created_At, LocalDateTime modify_At) {
         this.post = post;
         this.writer = writer;
         this.comment = comment;
+        this.created_At=created_At;
+        this.modify_At=modify_At;
     }
 
-    public void modifyComment(String comment) {
+    public void modifyComment(String comment, LocalDateTime modify_At) {
        this.comment = comment;
+       this.modify_At = modify_At;
     }
 }
