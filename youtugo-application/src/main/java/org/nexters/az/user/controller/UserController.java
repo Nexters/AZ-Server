@@ -96,7 +96,7 @@ public class UserController {
     }
 
     @ApiOperation("게시글 북마크 추가")
-    @PostMapping("/bookmark/{postId}")
+    @PostMapping("/bookmark/posts/{postId}")
     @ResponseStatus(HttpStatus.CREATED)
     public GetPostResponse addBookmarkPost(@RequestHeader String accessToken, @PathVariable Long postId) {
 

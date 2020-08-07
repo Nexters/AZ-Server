@@ -33,7 +33,7 @@ public class GetBookMarkPostsApiTest extends CommonTest {
 
         //given
         String accessToken = createUser().getAccessToken().getToken();
-        Long wrongUserId = 2L;
+        Long wrongUserId = 100000L;
 
         //when
         MvcResult mvcResult = mockMvc.perform(
