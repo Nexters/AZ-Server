@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.nexters.az.auth.security.TokenSubject;
 import org.nexters.az.auth.service.AuthService;
 import org.nexters.az.comment.response.GetCommentsResponse;
-import org.nexters.az.comment.service.CommentService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
@@ -37,7 +36,6 @@ import java.util.stream.Stream;
 public class UserController {
     private final UserService userService;
     private final AuthService authService;
-    private final CommentService commentService;
     private final PostService postService;
     private final PostBookMarkService postBookMarkService;
 
@@ -104,7 +102,7 @@ public class UserController {
 
         Post post = postBookMarkService.insertBookMarkInPost(user, postId);
 
-        return new GetPostResponse(detailedPostOf(post, user.getId()));
+        return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
     }
 
     @ApiOperation("게시글 북마크 취소")
@@ -147,21 +145,12 @@ public class UserController {
         }
     }
 
-    public DetailedPost detailedPostOf(Post post, Long userId) {
-        DetailedPost detailedPost = new DetailedPost(post);
-        detailedPost.setLikes(postService.countPostLike(post.getId()));
-        detailedPost.setBookMarks(postBookMarkService.countPostBookMark(post.getId()));
-        detailedPost.setLikes(commentService.findCommentCount(post.getId()));
-        detailedPost.setPressLike(postService.checkUserPressLike(userId, post.getId()));
-
-        return detailedPost;
-    }
-
     private List<DetailedPost> detailedPostsOf(Stream<PostBookMark> postBookMarks, Long userId) {
-
         List<DetailedPost> detailedPosts = new ArrayList<>();
-        postBookMarks.forEach(post -> detailedPosts.add(detailedPostOf(post.getPost(), userId)));
+        postBookMarks.forEach(post -> detailedPosts.add(postService.detailedPostOf(post.getPost(), userId)));
+        detailedPosts.forEach(DetailedPost::makeSimpleContent);
 
         return detailedPosts;
     }
+
 }

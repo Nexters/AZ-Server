@@ -1,11 +1,11 @@
 package org.nexters.az.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.nexters.az.comment.repository.CommentRepository;
+import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
-import org.nexters.az.post.entity.PostBookMark;
 import org.nexters.az.post.entity.PostLike;
 import org.nexters.az.post.exception.NonExistentPostException;
-import org.nexters.az.post.exception.UserAlreadyPressBookMarkException;
 import org.nexters.az.post.exception.UserAlreadyPressLikeException;
 import org.nexters.az.post.repository.PostBookMarkRepository;
 import org.nexters.az.post.repository.PostLikeRepository;
@@ -23,6 +23,19 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostBookMarkRepository postBookMarkRepository;
+    private final CommentRepository commentRepository;
+
+    public DetailedPost detailedPostOf(Post post, Long userId) {
+        DetailedPost detailedPost = new DetailedPost(post);
+        detailedPost.setLikes(countPostLike(post.getId()));
+        detailedPost.setBookMarks(postBookMarkRepository.countPostBookMarksByPostId(post.getId()));
+        detailedPost.setComments(commentRepository.countAllByPostId(post.getId()));
+        if (userId != null) {
+            detailedPost.setPressLike(checkUserPressLike(userId, post.getId()));
+        }
+
+        return detailedPost;
+    }
 
     public Post insertLikeInPost(User user, Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(NonExistentPostException::new);
