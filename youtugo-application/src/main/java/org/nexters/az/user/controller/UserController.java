@@ -147,6 +147,14 @@ public class UserController {
         }
     }
 
+    private List<DetailedPost> detailedPostsOf(Stream<PostBookMark> postBookMarks, Long userId) {
+
+        List<DetailedPost> detailedPosts = new ArrayList<>();
+        postBookMarks.forEach(post -> detailedPosts.add(detailedPostOf(post.getPost(), userId)));
+
+        return detailedPosts;
+    }
+
     public DetailedPost detailedPostOf(Post post, Long userId) {
         DetailedPost detailedPost = new DetailedPost(post);
         detailedPost.setLikes(postService.countPostLike(post.getId()));
@@ -157,11 +165,4 @@ public class UserController {
         return detailedPost;
     }
 
-    private List<DetailedPost> detailedPostsOf(Stream<PostBookMark> postBookMarks, Long userId) {
-
-        List<DetailedPost> detailedPosts = new ArrayList<>();
-        postBookMarks.forEach(post -> detailedPosts.add(detailedPostOf(post.getPost(), userId)));
-
-        return detailedPosts;
-    }
 }
