@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.nexters.az.auth.request.SignUpRequest;
 import org.nexters.az.auth.response.SignInResponse;
+import org.nexters.az.comment.request.WriteCommentRequest;
+import org.nexters.az.comment.response.WriteCommentResponse;
 import org.nexters.az.post.request.WritePostRequest;
 import org.nexters.az.post.response.GetPostResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +66,25 @@ public abstract class CommonTest {
         return objectMapper.readValue(
                 mvcResult.getResponse().getContentAsString(),
                 GetPostResponse.class
+        );
+    }
+
+    protected WriteCommentResponse createComment(Long postId, String accessToken) throws Exception {
+
+        WriteCommentRequest writeCommentRequest = new WriteCommentRequest("testComment");
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(POST_URL + "/" + postId + "/comments/comment")
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(writeCommentRequest))
+        ).andReturn();
+
+
+        return objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(),
+                WriteCommentResponse.class
         );
     }
 

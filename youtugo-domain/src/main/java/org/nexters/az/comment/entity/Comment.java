@@ -9,6 +9,7 @@ import org.nexters.az.post.entity.Post;
 import org.nexters.az.user.entity.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -24,7 +25,7 @@ public class Comment extends BaseTime {
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name="writer_id")
+    @JoinColumn(name = "writer_id")
     private User writer;
 
     @Column(nullable = false)
@@ -38,6 +39,6 @@ public class Comment extends BaseTime {
     }
 
     public void modifyComment(String comment) {
-       this.comment = comment;
+        this.comment = comment;
     }
 }
