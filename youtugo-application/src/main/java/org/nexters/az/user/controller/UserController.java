@@ -4,11 +4,15 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.nexters.az.auth.security.TokenSubject;
 import org.nexters.az.auth.service.AuthService;
+import org.nexters.az.comment.dto.DetailedComment;
+import org.nexters.az.comment.entity.Comment;
 import org.nexters.az.comment.response.GetCommentsResponse;
+import org.nexters.az.comment.service.CommentService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
 import org.nexters.az.exception.UnauthorizedException;
+import org.nexters.az.post.controller.PostController;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.entity.PostBookMark;
@@ -38,6 +42,7 @@ public class UserController {
     private final AuthService authService;
     private final PostService postService;
     private final PostBookMarkService postBookMarkService;
+    private final CommentService commentService;
 
     @ApiOperation("닉네임 중복 체크")
     @PostMapping("/nicknames/{nickname}/existence")
@@ -120,23 +125,55 @@ public class UserController {
     @ApiOperation("내가 작성한 글 조회")
     @GetMapping("/{userId}/posts")
     @ResponseStatus(HttpStatus.OK)
-    public GetPostsResponse getUserPosts(@PathVariable Long userId) {
-        /**
-         * author : 최민성
-         * 현재 엔드포인트만 잡은 상태
-         */
-        return null;
+    public GetPostsResponse getUserPosts(@RequestHeader String accessToken, @PathVariable Long userId,
+                                         @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                         @RequestParam(required = false, defaultValue = "10") int size) {
+
+        Long accessTokenId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
+        checkUserIdForBookMark(userId, accessTokenId);
+
+        CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
+
+        Page<Post> resultPostsPages = postService.getPostsByAuthor(userId,
+                PageRequest.of(
+                        currentPageAndPageSize.getCurrentPage()-1,
+                        currentPageAndPageSize.getPageSize(),
+                        Sort.by("createdDate").descending()
+                ));
+
+        SimplePage simplePage = SimplePage.builder()
+                .currentPage(resultPostsPages.getNumber())
+                .totalPages(resultPostsPages.getTotalPages())
+                .totalElements(resultPostsPages.getTotalElements())
+                .build();
+
+        return new GetPostsResponse(postService.detailedPostsOf(resultPostsPages.getContent(),userId),simplePage);
     }
 
     @ApiOperation("내가 작성한 댓글 조회")
-    @GetMapping("/{userId}/comments)")
+    @GetMapping("/{userId}/comments")
     @ResponseStatus(HttpStatus.OK)
-    public GetCommentsResponse getUserComments(@PathVariable Long userId) {
-        /**
-         * author : 최민성
-         * 현재 엔드포인트만 잡은 상태
-         */
-        return null;
+    public GetCommentsResponse getUserComments(@RequestHeader String accessToken, @PathVariable Long userId,
+                                               @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                               @RequestParam(required = false, defaultValue = "10") int size) {
+
+        Long accessTokenId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
+        checkUserIdForBookMark(userId, accessTokenId);
+
+        CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
+
+        Page<Comment> resultCommentsPages = commentService.getCommentsByWriter(userId,
+                PageRequest.of(currentPageAndPageSize.getCurrentPage()-1,
+                        currentPageAndPageSize.getPageSize(),
+                        Sort.by("CreatedDate").descending()));
+
+        SimplePage simplePage = SimplePage.builder()
+                .currentPage(resultCommentsPages.getNumber())
+                .totalPages(resultCommentsPages.getTotalPages())
+                .totalElements(resultCommentsPages.getTotalElements())
+                .build();
+
+        return new GetCommentsResponse(DetailedComment.detailedCommentsOf(resultCommentsPages.getContent()),simplePage);
     }
 
     public void checkUserIdForBookMark(Long userId, Long accessTokenUserId) {

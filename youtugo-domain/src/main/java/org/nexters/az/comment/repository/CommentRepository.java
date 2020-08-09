@@ -11,6 +11,8 @@ public interface CommentRepository extends ExtendRepository<Comment> {
 
     Optional<Comment> findByPostIdAndId(Long postId, Long commentId);
 
+    Page<Comment> findAllByWriterId(Long writerId, Pageable pageable);
+
     int countAllByWriterId(Long writerId);
 
     int countAllByPostId(Long postId);
