@@ -22,4 +22,6 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
+source $HOME/.bashrc
+
 nohup java -jar -Dspring.config.location=/home/ec2-user/app/application-real-db.properties $JAR_NAME > $REPOSITORY/zip/nohup.out 2>&1 &
