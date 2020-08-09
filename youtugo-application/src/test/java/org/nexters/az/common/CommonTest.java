@@ -120,8 +120,8 @@ public abstract class CommonTest {
         testNO++;
 
         return new SignUpRequest(
-                "test" + testNO,
-                "test" + testNO,
+                "testID" + testNO,
+                "testNick" + testNO,
                 COMMON_PW
         );
     }
