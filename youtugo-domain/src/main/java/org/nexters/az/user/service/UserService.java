@@ -25,8 +25,8 @@ public class UserService {
     private final CommentRepository commentRepository;
 
     public User signUp(User user) {
-        checkUserNicknameExist(user.getIdentification());
-        checkUserIdentificationExist(user.getNickname());
+        checkUserNicknameExist(user.getNickname());
+        checkUserIdentificationExist(user.getIdentification());
         user.setHashedPassword(SHA256Util.of(user.getHashedPassword()));
         return userRepository.save(user);
     }
