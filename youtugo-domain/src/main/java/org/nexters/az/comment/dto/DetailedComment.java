@@ -33,6 +33,10 @@ public class DetailedComment {
         this.content=comment.getComment();
     }
 
+    public static DetailedComment detailedCommentOf(Comment comment) {
+        return new DetailedComment(comment);
+    }
+
     public static List<DetailedComment> detailedCommentsOf(List<Comment> comments) {
         List<DetailedComment> detailedComments = new ArrayList<>();
         comments.forEach(comment -> {
@@ -41,9 +45,4 @@ public class DetailedComment {
 
         return detailedComments;
     }
-
-    public static DetailedComment detailedCommentOf(Comment comment) {
-        return new DetailedComment(comment);
-    }
-
 }

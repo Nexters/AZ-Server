@@ -16,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,6 +27,14 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final PostBookMarkRepository postBookMarkRepository;
     private final CommentRepository commentRepository;
+
+    public List<DetailedPost> detailedPostsOf(List<Post> posts, Long userId) {
+        List<DetailedPost> detailedPosts = new ArrayList<>();
+        posts.forEach(post -> detailedPosts.add(detailedPostOf(post, userId)));
+        detailedPosts.forEach(DetailedPost::makeSimpleContent);
+
+        return detailedPosts;
+    }
 
     public DetailedPost detailedPostOf(Post post, Long userId) {
         DetailedPost detailedPost = new DetailedPost(post);
@@ -72,6 +83,10 @@ public class PostService {
 
     public Post getPost(Long postId) {
         return postRepository.findById(postId).orElseThrow(NonExistentPostException::new);
+    }
+
+    public Page<Post> getPostsByAuthor(Long authorId, Pageable pageable) {
+        return postRepository.findAllByAuthorId(authorId,pageable);
     }
 
     public boolean checkExistPost(Long postId) {

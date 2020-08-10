@@ -76,7 +76,7 @@ public class PostController {
                 .totalPages(searchResult.getTotalPages())
                 .totalElements(searchResult.getTotalElements())
                 .build();
-        List<DetailedPost> detailedPosts = detailedPostsOf(searchResult.getContent(), userId);
+        List<DetailedPost> detailedPosts = postService.detailedPostsOf(searchResult.getContent(), userId);
 
         return new GetPostsResponse(detailedPosts, simplePage);
     }
@@ -148,13 +148,4 @@ public class PostController {
 
         return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
    }
-
-    private List<DetailedPost> detailedPostsOf(List<Post> posts, Long userId) {
-        List<DetailedPost> detailedPosts = new ArrayList<>();
-        posts.forEach(post -> detailedPosts.add(postService.detailedPostOf(post, userId)));
-        detailedPosts.forEach(DetailedPost::makeSimpleContent);
-
-        return detailedPosts;
-    }
-
 }

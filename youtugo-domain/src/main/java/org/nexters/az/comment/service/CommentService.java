@@ -41,6 +41,10 @@ public class CommentService {
         return commentRepository.save(commentForModify);
     }
 
+    public Page<Comment> getCommentsByWriter(Long writerId, Pageable pageable){
+        return commentRepository.findAllByWriterId(writerId, pageable);
+    }
+
     public int findCommentCount(Long postId) {
         return commentRepository.countAllByPostId(postId);
     }
