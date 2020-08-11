@@ -3,6 +3,7 @@ package org.nexters.az.auth.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.nexters.az.auth.dto.AccessToken;
+import org.nexters.az.auth.request.SignInRequest;
 import org.nexters.az.auth.request.SignUpRequest;
 import org.nexters.az.auth.response.RefreshAccessTokenResponse;
 import org.nexters.az.auth.response.SignInResponse;
@@ -38,8 +39,8 @@ public class AuthController {
     @ApiOperation("로그인")
     @PostMapping("/sign-in")
     @ResponseStatus(HttpStatus.OK)
-    public SignInResponse signIn(@RequestBody SignUpRequest signUpRequest) {
-        User user = userService.signIn(signUpRequest.getIdentification(), signUpRequest.getPassword());
+    public SignInResponse signIn(@RequestBody SignInRequest signInRequest) {
+        User user = userService.signIn(signInRequest.getIdentification(), signInRequest.getPassword());
 
         return makeSignInResponse(user);
     }
