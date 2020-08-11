@@ -1,21 +1,14 @@
-# This is a basic workflow to help you get started with Actions
+name: Spring Boot CD
 
-name: Spring Boot CI/CD
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
-  pull_request:
+  push:
     branches:
       - develop
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
-    # 실행 환경 지정
+  merge-branch:
     runs-on: ubuntu-18.04
 
-    # Task의 sequence를 명시한다.
     steps:
       - uses: actions/checkout@v2
 
@@ -66,7 +59,7 @@ jobs:
           --file-exists-behavior OVERWRITE \
           --s3-location bucket=az-deploy,bundleType=zip,key=code-deploy-youtugo-application.zip \
           --region ap-northeast-2
-       
+
       - uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
@@ -75,7 +68,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
         if: always() # Pick up events even if the job fails or is canceled.
-
-
-
-
