@@ -39,10 +39,11 @@ public class PostService {
     public DetailedPost detailedPostOf(Post post, Long userId) {
         DetailedPost detailedPost = new DetailedPost(post);
         detailedPost.setLikes(countPostLike(post.getId()));
-        detailedPost.setBookMarks(postBookMarkRepository.countPostBookMarksByPostId(post.getId()));
-        detailedPost.setComments(commentRepository.countAllByPostId(post.getId()));
+        detailedPost.setBookMarkCount(postBookMarkRepository.countPostBookMarksByPostId(post.getId()));
+        detailedPost.setCommentCount(commentRepository.countAllByPostId(post.getId()));
         if (userId != null) {
             detailedPost.setPressLike(checkUserPressLike(userId, post.getId()));
+            detailedPost.setPressBookMark(checkUserPressBookMark(userId, post.getId()));
         }
 
         return detailedPost;
@@ -73,6 +74,10 @@ public class PostService {
         return postLikeRepository.existsByUserIdAndPostId(userId, postId);
     }
 
+    public boolean checkUserPressBookMark(Long userId, Long postId) {
+        return postBookMarkRepository.existsByUserIdAndPostId(userId, postId);
+    }
+
     public Post create(Post post) {
         return postRepository.save(post);
     }
@@ -100,6 +105,5 @@ public class PostService {
     public int getPostCountBy(Long userId) {
         return postRepository.countAllByAuthorId(userId);
     }
-
 
 }
