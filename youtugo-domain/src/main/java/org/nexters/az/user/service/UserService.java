@@ -94,7 +94,7 @@ public class UserService {
         }
         else {
             currentRating = Rating.BOSS;
-            nextRating = Rating.BOSS;
+            nextRating = null;
 
         }
 
@@ -112,7 +112,7 @@ public class UserService {
     }
 
     private float makeProgress(int postCount, int commentCount, Rating rating) {
-        if (rating == Rating.BOSS) return 1;
+        if (rating == null) return 1;
         
         int postCountForPromotion = rating.getPostCount();
         int commentCountForPromotion = rating.getCommentCount();

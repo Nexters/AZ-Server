@@ -10,6 +10,6 @@ public class CurrentPageValidation extends Validator<Integer> {
 
     @Override
     public boolean test(Integer currentPage) {
-        return currentPage >= 0;
+        return currentPage > 0;
     }
 }

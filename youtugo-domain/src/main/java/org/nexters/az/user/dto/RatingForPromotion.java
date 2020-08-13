@@ -3,9 +3,11 @@ package org.nexters.az.user.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.nexters.az.user.entity.Rating;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class RatingForPromotion {
     private Rating currentRating;
