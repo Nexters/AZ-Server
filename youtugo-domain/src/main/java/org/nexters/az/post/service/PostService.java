@@ -62,6 +62,7 @@ public class PostService {
                 .build();
 
         postLikeRepository.save(postLike);
+        postRepository.updateLikeCount(postId);
 
         return post;
     }
@@ -92,6 +93,10 @@ public class PostService {
 
     public Page<Post> getPostsByAuthor(Long authorId, Pageable pageable) {
         return postRepository.findAllByAuthorId(authorId,pageable);
+    }
+
+    public void updateViewCount(Long postId){
+        postRepository.updateViewCount(postId);
     }
 
     public boolean checkExistPost(Long postId) {

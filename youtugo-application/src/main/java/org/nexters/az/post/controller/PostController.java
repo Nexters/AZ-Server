@@ -112,6 +112,7 @@ public class PostController {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
+        postService.updateViewCount(postId);
         DetailedPost detailedPost = postService.detailedPostOf(postService.getPost(postId), userId);
 
         return new GetPostResponse(detailedPost);
