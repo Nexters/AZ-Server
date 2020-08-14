@@ -35,4 +35,13 @@ public class Post extends BaseTime {
         this.likeCount = likeCount;
         this.viewCount = viewCount;
     }
+
+    public void updateLikeCount() {
+        this.likeCount = this.likeCount + 1;
+    }
+
+    public void updateViewCount() {
+        this.viewCount = this.viewCount + 1;
+    }
+
 }

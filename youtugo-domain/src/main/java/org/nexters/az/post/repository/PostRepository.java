@@ -22,16 +22,11 @@ public interface PostRepository extends ExtendRepository<Post> {
 
     int countAllByAuthorId(Long authorId);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Post SET likeCount = likeCount + 1 WHERE id = :id")
-    void updateLikeCount(@Param("id") Long id);
+    @Query(nativeQuery = true, value = "SELECT *, p.likeCount*p.viewCount AS popular from Post p order by popular asc limit:pageNo, 10; ")
+    Page<Post> selectPostByLikeCountAndViewCount(@Param("pageNo") Pageable pageNo);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Post SET viewCount = viewCount + 1 WHERE id = :id")
-    void updateViewCount(@Param("id") Long id);
+    @Query("SELECT p FROM Post p ORDER BY p.likeCount*p.viewCount DESC")
+    Page<Post> findPopularPosts(Pageable pageable);
 
-//    @Query(nativeQuery = true, value = "SELECT *, p.likeCount*p.viewCount AS popular from Post p order by popular asc limit:pageNo, 10; ")
-//    Page<Post> selectPostByLikeCountAndViewCount(@Param("pageNo")int pageNo);
+
 }
