@@ -62,6 +62,8 @@ public class PostService {
                 .build();
 
         postLikeRepository.save(postLike);
+        post.updateLikeCount();
+        postRepository.save(post);
 
         return post;
     }
@@ -92,6 +94,16 @@ public class PostService {
 
     public Page<Post> getPostsByAuthor(Long authorId, Pageable pageable) {
         return postRepository.findAllByAuthorId(authorId,pageable);
+    }
+
+    public void updateViewCount(Long postId){
+        Post post = postRepository.findById(postId).orElseThrow(NonExistentPostException::new);
+        post.updateViewCount();
+        postRepository.save(post);
+    }
+
+    public Page<Post> getPopularPosts(Pageable pageable){
+        return postRepository.findPopularPosts(pageable);
     }
 
     public boolean checkExistPost(Long postId) {

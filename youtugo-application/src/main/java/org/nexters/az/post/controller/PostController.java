@@ -93,11 +93,23 @@ public class PostController {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
-        /**
-         * @author : 최민성
-         * 현재 엔드포인트만 잡은 상태
-         */
-        return null;
+        CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
+
+        Page<Post> searchResult = postService.getPopularPosts(
+                PageRequest.of(
+                        currentPageAndPageSize.getCurrentPage() - 1,
+                        currentPageAndPageSize.getPageSize()
+                )
+        );
+
+        SimplePage simplePage = SimplePage.builder()
+                .currentPage(searchResult.getNumber())
+                .totalPages(searchResult.getTotalPages())
+                .totalElements(searchResult.getTotalElements())
+                .build();
+        List<DetailedPost> detailedPosts = postService.detailedPostsOf(searchResult.getContent(), userId);
+
+        return new GetPostsResponse(detailedPosts,simplePage);
     }
 
     @ApiOperation("게시글 상세보기")
@@ -112,6 +124,7 @@ public class PostController {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
+        postService.updateViewCount(postId);
         DetailedPost detailedPost = postService.detailedPostOf(postService.getPost(postId), userId);
 
         return new GetPostResponse(detailedPost);

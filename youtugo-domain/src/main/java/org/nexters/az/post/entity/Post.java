@@ -25,9 +25,23 @@ public class Post extends BaseTime {
     @Column(nullable = false)
     private String content;
 
+    private int likeCount;
+    private int viewCount;
+
     @Builder
-    public Post(User author, String content) {
+    public Post(User author, String content, int likeCount, int viewCount) {
         this.author = author;
         this.content = content;
+        this.likeCount = likeCount;
+        this.viewCount = viewCount;
     }
+
+    public void updateLikeCount() {
+        this.likeCount = this.likeCount + 1;
+    }
+
+    public void updateViewCount() {
+        this.viewCount = this.viewCount + 1;
+    }
+
 }
