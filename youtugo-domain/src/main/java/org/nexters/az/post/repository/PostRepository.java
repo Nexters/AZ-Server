@@ -16,17 +16,13 @@ import javax.transaction.Transactional;
 public interface PostRepository extends ExtendRepository<Post> {
     void deleteByIdAndAuthorId(Long postId, Long userId);
 
-    Page<Post> findAllByAuthorId (Long authorId, Pageable pageable);
+    Page<Post> findAllByAuthorId(Long authorId, Pageable pageable);
 
     boolean existsById(Long postId);
 
     int countAllByAuthorId(Long authorId);
 
-    @Query(nativeQuery = true, value = "SELECT *, p.likeCount*p.viewCount AS popular from Post p order by popular asc limit:pageNo, 10; ")
-    Page<Post> selectPostByLikeCountAndViewCount(@Param("pageNo") Pageable pageNo);
-
-    @Query("SELECT p FROM Post p ORDER BY p.likeCount*p.viewCount DESC")
+    @Query("SELECT p FROM Post p ORDER BY (p.likeCount+1)*p.viewCount DESC ")
     Page<Post> findPopularPosts(Pageable pageable);
-
 
 }
