@@ -7,6 +7,8 @@ import org.nexters.az.auth.service.AuthService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
+import org.nexters.az.notice.entity.NoticeType;
+import org.nexters.az.notice.service.NoticeService;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.exception.NoPermissionDeletePostException;
@@ -28,6 +30,7 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final AuthService authService;
+    private final NoticeService noticeService;
 
     @ApiOperation("게시글 작성")
     @PostMapping("/post")
@@ -157,6 +160,7 @@ public class PostController {
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.insertLikeInPost(user, postId);
+        noticeService.insertNotice(post.getAuthor(), post, NoticeType.LIKE, user.getNickname());
 
         return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
    }
