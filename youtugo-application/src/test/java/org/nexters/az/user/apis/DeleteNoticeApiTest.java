@@ -45,14 +45,22 @@ public class DeleteNoticeApiTest extends CommonTest {
     @Test
     public void testDeleteNoticeFailBecauseNotExistentNoticeException() throws Exception {
         //given
-        SignInResponse signInResponse = createUser();
-        String accessToken = signInResponse.getAccessToken().getToken();
-        Long userId = signInResponse.getUser().getId();
+        SignInResponse responser = createUser();
+        String responserAccessToken = responser.getAccessToken().getToken();
+
+        SignInResponse writer = createUser();
+        String  writerAccessToken= writer.getAccessToken().getToken();
+        Long writerId = writer.getUser().getId();
+        GetPostResponse getPostResponse =createPost(writerAccessToken);
+        WriteCommentResponse writeCommentResponse =createComment(getPostResponse.getDetailedPost().getId(),responserAccessToken);
+
+        GetNoticesResponse getNoticesResponse = createNotice(writerId,writerAccessToken);
+        Long wrongNoticeId = 10000000L;
 
         //when
         MvcResult mvcResult = mockMvc.perform(
-                delete(USER_URL+"/"+userId+"/notices/"+1)
-                        .header("accessToken",accessToken)
+                delete(USER_URL+"/"+writerId+"/notices/"+wrongNoticeId)
+                        .header("accessToken",writerAccessToken)
         ).andReturn();
 
         //then
