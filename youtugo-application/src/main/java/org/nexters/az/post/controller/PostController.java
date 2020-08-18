@@ -7,6 +7,7 @@ import org.nexters.az.auth.service.AuthService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
+import org.nexters.az.notice.entity.Notice;
 import org.nexters.az.notice.entity.NoticeType;
 import org.nexters.az.notice.service.NoticeService;
 import org.nexters.az.post.dto.DetailedPost;
@@ -160,7 +161,13 @@ public class PostController {
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.insertLikeInPost(user, postId);
-        noticeService.insertNotice(post.getAuthor(), post, NoticeType.LIKE, user.getNickname());
+        Notice notice =Notice.builder()
+        .user(user)
+        .post(post)
+        .responder(post.getAuthor())
+        .noticeType(NoticeType.LIKE).build();
+
+        noticeService.insertNotice(notice);
 
         return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
    }

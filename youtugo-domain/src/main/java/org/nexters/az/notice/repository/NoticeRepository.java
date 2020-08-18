@@ -12,5 +12,4 @@ public interface NoticeRepository extends ExtendRepository<Notice> {
 
     Page<Notice> findAllByUserId(Long userId, Pageable pageable);
 
-    Optional<Notice> findByNickNameAndNoticeType(String nickName, NoticeType noticeType);
 }

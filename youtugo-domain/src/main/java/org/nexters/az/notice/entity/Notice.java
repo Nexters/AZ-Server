@@ -30,14 +30,15 @@ public class Notice extends BaseTime {
 
     private NoticeType noticeType;
 
-    @Column(nullable = false)
-    private String nickName;
+    @ManyToOne
+    @JoinColumn(name = "responder_id")
+    private User responder;
 
     @Builder
-    public Notice(User user, Post post, NoticeType noticeType, String nickName) {
+    public Notice(User user, Post post, NoticeType noticeType, User responder) {
         this.user = user;
         this.post = post;
         this.noticeType = noticeType;
-        this.nickName = nickName;
+        this.responder = responder;
     }
 }

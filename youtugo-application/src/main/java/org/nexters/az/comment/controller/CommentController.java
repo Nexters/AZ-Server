@@ -57,7 +57,12 @@ public class CommentController {
                         .comment(writeCommentRequest.getComment())
                         .build()));
 
-        noticeService.insertNotice(post.getAuthor(),post, NoticeType.COMMENT,writer.getNickname());
+        Notice notice = Notice.builder()
+                .user(post.getAuthor())
+                .post(post)
+                .noticeType(NoticeType.COMMENT)
+                .responder(writer).build();
+        noticeService.insertNotice(notice);
         return new WriteCommentResponse(detailedComment);
     }
 

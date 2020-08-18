@@ -12,7 +12,12 @@ import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
 import org.nexters.az.exception.UnauthorizedException;
-import org.nexters.az.post.controller.PostController;
+import org.nexters.az.notice.dto.DetailedNotice;
+import org.nexters.az.notice.entity.Notice;
+import org.nexters.az.notice.entity.NoticeType;
+import org.nexters.az.user.exception.NoPermissionNoticeException;
+import org.nexters.az.user.response.GetNoticesResponse;
+import org.nexters.az.notice.service.NoticeService;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.entity.PostBookMark;
@@ -43,6 +48,7 @@ public class UserController {
     private final PostService postService;
     private final PostBookMarkService postBookMarkService;
     private final CommentService commentService;
+    private final NoticeService noticeService;
 
     @ApiOperation("닉네임 중복 체크")
     @PostMapping("/nicknames/{nickname}/existence")
@@ -176,9 +182,57 @@ public class UserController {
         return new GetCommentsResponse(DetailedComment.detailedCommentsOf(resultCommentsPages.getContent()),simplePage);
     }
 
+    @ApiOperation("알림 리스트 조회")
+    @GetMapping("/{userId}/notices")
+    @ResponseStatus(HttpStatus.OK)
+    public GetNoticesResponse getNotices(@RequestHeader String accessToken,
+                                         @PathVariable Long userId,
+                                         @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                         @RequestParam(required = false, defaultValue = "10") int size) {
+
+        User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
+        checkUserIdForNotice(userId,user.getId());
+
+        CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
+
+        Page<Notice> notices = noticeService.getNotices(user.getId(),
+                PageRequest.of(
+                        currentPageAndPageSize.getCurrentPage() - 1,
+                        currentPageAndPageSize.getPageSize(),
+                        Sort.by("createdDate").descending()
+                )
+        );
+
+        SimplePage simplePage = SimplePage.builder()
+                .currentPage(notices.getNumber())
+                .totalPages(notices.getTotalPages())
+                .totalElements(notices.getTotalElements())
+                .build();
+
+        return new GetNoticesResponse(detailedNoticesOf(notices.getContent()),simplePage);
+    }
+
+    @ApiOperation("알림 삭제")
+    @DeleteMapping("{userId}/notices/{noticeId}")
+    @ResponseStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
+    public void deleteNotice(@RequestHeader String accessToken,
+                             @PathVariable Long userId,
+                             @PathVariable Long noticeId) {
+
+        User user = authService.findUserByToken(accessToken,TokenSubject.ACCESS_TOKEN);
+        checkUserIdForNotice(userId,user.getId());
+        noticeService.deleteNotice(userId, noticeId);
+    }
+
     public void checkUserIdForBookMark(Long userId, Long accessTokenUserId) {
         if (!userId.equals(accessTokenUserId)) {
             throw new NoPermissionBookMarkException();
+        }
+    }
+
+    public void checkUserIdForNotice(Long userId, Long accessTokenUserId) {
+        if (!userId.equals(accessTokenUserId)) {
+            throw new NoPermissionNoticeException();
         }
     }
 
@@ -188,6 +242,30 @@ public class UserController {
         detailedPosts.forEach(DetailedPost::makeSimpleContent);
 
         return detailedPosts;
+    }
+
+    public  List<DetailedNotice> detailedNoticesOf(List<Notice> notices) {
+        List<DetailedNotice> detailedNotices = new ArrayList<>();
+        notices.forEach(notice -> detailedNotices.add(detailedNoticeOf(notice)));
+
+        return detailedNotices;
+    }
+
+    public  DetailedNotice detailedNoticeOf(Notice notice){
+
+        DetailedPost detailedPost = postService.detailedPostOf(notice.getPost(),notice.getPost().getAuthor().getId());
+        String noticeMessage = "";
+
+        switch (notice.getNoticeType()){
+            case COMMENT:
+                noticeMessage = notice.getResponder().getNickname() + NoticeType.COMMENT.getMessage();
+                break;
+            case LIKE:
+                noticeMessage = notice.getResponder().getNickname() + NoticeType.LIKE.getMessage();
+                break;
+        }
+
+        return new DetailedNotice(notice.getId(),notice.getPost().getId(),notice.getNoticeType(),noticeMessage);
     }
 
 }
