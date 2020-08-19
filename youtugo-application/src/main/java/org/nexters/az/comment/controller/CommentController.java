@@ -15,6 +15,9 @@ import org.nexters.az.comment.service.CommentService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
+import org.nexters.az.notice.entity.Notice;
+import org.nexters.az.notice.entity.NoticeType;
+import org.nexters.az.notice.service.NoticeService;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.service.PostService;
 import org.nexters.az.user.entity.User;
@@ -34,6 +37,7 @@ public class CommentController {
     private final CommentService commentService;
     private final AuthService authService;
     private final PostService postService;
+    private final NoticeService noticeService;
 
     @ApiOperation("댓글 작성")
     @PostMapping("/{postId}/comments/comment")
@@ -53,6 +57,12 @@ public class CommentController {
                         .comment(writeCommentRequest.getComment())
                         .build()));
 
+        Notice notice = Notice.builder()
+                .user(post.getAuthor())
+                .post(post)
+                .noticeType(NoticeType.COMMENT)
+                .responder(writer).build();
+        noticeService.insertNotice(notice);
         return new WriteCommentResponse(detailedComment);
     }
 
@@ -107,7 +117,8 @@ public class CommentController {
                               @PathVariable Long commentId,
                               @RequestHeader String accessToken) {
 
-        Long deleterId = authService.findUserIdBy(accessToken,TokenSubject.ACCESS_TOKEN);
+        User deleter = authService.findUserByToken(accessToken,TokenSubject.ACCESS_TOKEN);
+        Long deleterId = deleter.getId();
 
         commentService.deleteComment(deleterId, postId, commentId);
     }

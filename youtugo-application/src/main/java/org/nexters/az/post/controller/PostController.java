@@ -7,6 +7,9 @@ import org.nexters.az.auth.service.AuthService;
 import org.nexters.az.common.dto.CurrentPageAndPageSize;
 import org.nexters.az.common.dto.SimplePage;
 import org.nexters.az.common.validation.PageValidation;
+import org.nexters.az.notice.entity.Notice;
+import org.nexters.az.notice.entity.NoticeType;
+import org.nexters.az.notice.service.NoticeService;
 import org.nexters.az.post.dto.DetailedPost;
 import org.nexters.az.post.entity.Post;
 import org.nexters.az.post.exception.NoPermissionDeletePostException;
@@ -28,13 +31,14 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final AuthService authService;
+    private final NoticeService noticeService;
 
     @ApiOperation("게시글 작성")
     @PostMapping("/post")
     @ResponseStatus(HttpStatus.CREATED)
     public WritePostResponse writePost(
-        @RequestHeader String accessToken,
-        @RequestBody WritePostRequest writePostRequest
+            @RequestHeader String accessToken,
+            @RequestBody WritePostRequest writePostRequest
     ) {
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
@@ -51,23 +55,23 @@ public class PostController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getPosts(
-        @RequestHeader(required = false, defaultValue = "") String accessToken,
-        @RequestParam(required = false, defaultValue = "1") int currentPage,
-        @RequestParam(required = false, defaultValue = "10") int size
+            @RequestHeader(required = false, defaultValue = "") String accessToken,
+            @RequestParam(required = false, defaultValue = "1") int currentPage,
+            @RequestParam(required = false, defaultValue = "10") int size
     ) {
         Long userId = null;
-        if(!accessToken.equals("")) {
+        if (!accessToken.equals("")) {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
         CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
 
         Page<Post> searchResult = postService.getPosts(
-            PageRequest.of(
-                currentPageAndPageSize.getCurrentPage() - 1,
-                currentPageAndPageSize.getPageSize(),
-                Sort.by("createdDate").descending()
-            )
+                PageRequest.of(
+                        currentPageAndPageSize.getCurrentPage() - 1,
+                        currentPageAndPageSize.getPageSize(),
+                        Sort.by("createdDate").descending()
+                )
         );
 
         SimplePage simplePage = SimplePage.builder()
@@ -84,12 +88,12 @@ public class PostController {
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getPopularPosts(
-        @RequestHeader(required = false, defaultValue = "") String accessToken,
-        @RequestParam(required = false, defaultValue = "1") int currentPage,
-        @RequestParam(required = false, defaultValue = "10") int size
+            @RequestHeader(required = false, defaultValue = "") String accessToken,
+            @RequestParam(required = false, defaultValue = "1") int currentPage,
+            @RequestParam(required = false, defaultValue = "10") int size
     ) {
         Long userId = null;
-        if(!accessToken.equals("")) {
+        if (!accessToken.equals("")) {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
@@ -109,18 +113,18 @@ public class PostController {
                 .build();
         List<DetailedPost> detailedPosts = postService.detailedPostsOf(searchResult.getContent(), userId);
 
-        return new GetPostsResponse(detailedPosts,simplePage);
+        return new GetPostsResponse(detailedPosts, simplePage);
     }
 
     @ApiOperation("게시글 상세보기")
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public GetPostResponse getPost(
-        @RequestHeader(required = false, defaultValue = "") String accessToken,
-        @PathVariable Long postId
+            @RequestHeader(required = false, defaultValue = "") String accessToken,
+            @PathVariable Long postId
     ) {
         Long userId = null;
-        if(!accessToken.equals("")) {
+        if (!accessToken.equals("")) {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
@@ -134,13 +138,13 @@ public class PostController {
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
     public void deletePost(
-        @RequestHeader String accessToken,
-        @PathVariable Long postId
+            @RequestHeader String accessToken,
+            @PathVariable Long postId
     ) {
         Long userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.getPost(postId);
-        if(!post.getAuthor().getId().equals(userId)) {
+        if (!post.getAuthor().getId().equals(userId)) {
             throw new NoPermissionDeletePostException();
         }
 
@@ -151,13 +155,20 @@ public class PostController {
     @PostMapping("/{postId}/likes")
     @ResponseStatus(HttpStatus.CREATED)
     public GetPostResponse insertLikeInPost(
-        @RequestHeader String accessToken,
-        @PathVariable Long postId
+            @RequestHeader String accessToken,
+            @PathVariable Long postId
     ) {
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.insertLikeInPost(user, postId);
+        Notice notice = Notice.builder()
+                .user(user)
+                .post(post)
+                .responder(post.getAuthor())
+                .noticeType(NoticeType.LIKE).build();
+
+        noticeService.insertNotice(notice);
 
         return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
-   }
+    }
 }

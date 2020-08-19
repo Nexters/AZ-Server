@@ -9,6 +9,7 @@ import org.nexters.az.comment.request.WriteCommentRequest;
 import org.nexters.az.comment.response.WriteCommentResponse;
 import org.nexters.az.post.request.WritePostRequest;
 import org.nexters.az.post.response.GetPostResponse;
+import org.nexters.az.user.response.GetNoticesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
@@ -66,6 +68,20 @@ public abstract class CommonTest {
         return objectMapper.readValue(
                 mvcResult.getResponse().getContentAsString(),
                 GetPostResponse.class
+        );
+    }
+
+    protected GetNoticesResponse createNotice(Long userId, String accessToken) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        MvcResult mvcResult = mockMvc.perform(
+                get(USER_URL+"/"+userId+"/notices")
+                        .header("accessToken",accessToken)
+        ).andReturn();
+
+        return objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(),
+                GetNoticesResponse.class
         );
     }
 
