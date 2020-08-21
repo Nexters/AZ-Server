@@ -88,21 +88,16 @@ public class PostController {
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public GetPostsResponse getPopularPosts(
-            @RequestHeader(required = false, defaultValue = "") String accessToken,
-            @RequestParam(required = false, defaultValue = "1") int currentPage,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @RequestHeader(required = false, defaultValue = "") String accessToken
     ) {
         Long userId = null;
         if (!accessToken.equals("")) {
             userId = authService.findUserIdBy(accessToken, TokenSubject.ACCESS_TOKEN);
         }
 
-        CurrentPageAndPageSize currentPageAndPageSize = PageValidation.getInstance().verify(currentPage, size);
-
         Page<Post> searchResult = postService.getPopularPosts(
                 PageRequest.of(
-                        currentPageAndPageSize.getCurrentPage() - 1,
-                        currentPageAndPageSize.getPageSize()
+                        0, 10
                 )
         );
 
@@ -161,13 +156,16 @@ public class PostController {
         User user = authService.findUserByToken(accessToken, TokenSubject.ACCESS_TOKEN);
 
         Post post = postService.insertLikeInPost(user, postId);
-        Notice notice = Notice.builder()
-                .user(user)
-                .post(post)
-                .responder(post.getAuthor())
-                .noticeType(NoticeType.LIKE).build();
 
-        noticeService.insertNotice(notice);
+        if (post.getAuthor().getId() != user.getId()) {
+            Notice notice = Notice.builder()
+                    .user(post.getAuthor())
+                    .post(post)
+                    .responder(user)
+                    .noticeType(NoticeType.LIKE).build();
+
+            noticeService.insertNotice(notice);
+        }
 
         return new GetPostResponse(postService.detailedPostOf(post, user.getId()));
     }
