@@ -106,6 +106,10 @@ public class PostService {
         return postRepository.findPopularPosts(pageable);
     }
 
+    public void updatePopularPosts(Pageable pageable){
+        postRepository.findPopularPosts(pageable);
+
+    }
     public boolean checkExistPost(Long postId) {
         return postRepository.existsById(postId);
     }

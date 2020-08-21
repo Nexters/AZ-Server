@@ -27,7 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -57,12 +56,14 @@ public class CommentController {
                         .comment(writeCommentRequest.getComment())
                         .build()));
 
-        Notice notice = Notice.builder()
-                .user(post.getAuthor())
-                .post(post)
-                .noticeType(NoticeType.COMMENT)
-                .responder(writer).build();
-        noticeService.insertNotice(notice);
+        if (post.getAuthor().getId() != writer.getId()) {
+            Notice notice = Notice.builder()
+                    .user(post.getAuthor())
+                    .post(post)
+                    .noticeType(NoticeType.COMMENT)
+                    .responder(writer).build();
+            noticeService.insertNotice(notice);
+        }
         return new WriteCommentResponse(detailedComment);
     }
 
@@ -81,7 +82,7 @@ public class CommentController {
                 PageRequest.of(
                         currentPageAndPageSize.getCurrentPage() - 1,
                         currentPageAndPageSize.getPageSize(),
-                        Sort.by("createdDate").descending()
+                        Sort.by("createdDate").ascending()
                 )
         );
 
