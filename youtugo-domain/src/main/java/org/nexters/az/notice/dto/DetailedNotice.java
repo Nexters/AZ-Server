@@ -1,7 +1,11 @@
 package org.nexters.az.notice.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.nexters.az.notice.entity.Notice;
 import org.nexters.az.notice.entity.NoticeType;
 import org.nexters.az.post.dto.DetailedPost;
 
@@ -15,10 +19,15 @@ public class DetailedNotice {
     private NoticeType noticeType;
     private String message;
 
-    public DetailedNotice(DetailedPost detailedPost, Long noticeId, NoticeType noticeType, String message) {
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
+    private LocalDate createdDate;
+
+    public DetailedNotice(DetailedPost detailedPost, Notice notice, String message) {
         this.detailedPost = detailedPost;
-        this.noticeId = noticeId;
-        this.noticeType = noticeType;
+        this.noticeId = notice.getId();
+        this.createdDate = notice.getCreatedDate().toLocalDate();
+        this.noticeType = notice.getNoticeType();
         this.message = message;
     }
 }

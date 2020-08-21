@@ -265,7 +265,7 @@ public class UserController {
                 break;
         }
 
-        return new DetailedNotice(detailedPost,notice.getId(),notice.getNoticeType(),noticeMessage);
+        return new DetailedNotice(detailedPost,notice,noticeMessage);
     }
 
 }
