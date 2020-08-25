@@ -28,7 +28,6 @@
 - feature/{issue-number}
 
 ## ⚙ 환경 변수(intelij 기준)
-<img width="690" alt="스크린샷 2020-07-19 오전 10 45 28" src="https://user-images.githubusercontent.com/50758600/87865186-0e05ae80-c9ad-11ea-9552-61f85e054f07.png">
 
 secrets.MYSQL_URL
 - 예시 : jdbc:mysql://localhost:3306/angelhack
